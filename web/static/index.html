@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>GSH Tool · @prr9293 (Telegram)</title>
+<title>GSH Tool</title>
 <meta name="auth-token" content="__AUTH_TOKEN__" />
 <link rel="stylesheet" href="/static/style.css?v=__ASSET_VERSION__" />
 </head>
@@ -13,10 +13,6 @@
     <span class="brand-dot"></span>
     <span class="brand-name">GSH</span>
     <span class="brand-tag">Batch signup + 2FA</span>
-    <a class="brand-telegram" href="https://t.me/prr9293" target="_blank" rel="noopener noreferrer" title="Contact @prr9293 on Telegram — buy iCloud mail / support">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 2 11 13"/><path d="M22 2 15 22l-4-9-9-4 20-7z"/></svg>
-      <span>@prr9293</span>
-    </a>
   </div>
   <nav class="tab-nav">
     <button class="tab-btn active" data-tab="reg">Reg</button>
@@ -71,10 +67,6 @@
     <header class="card-head">
       <h2>Input Combos</h2>
       <span class="muted card-head-note" id="input-hint">One combo per line: email|password|refresh_token|client_id</span>
-      <a class="card-head-tg" href="https://t.me/prr9293" target="_blank" rel="noopener noreferrer" title="Contact @prr9293 — buy iCloud mail / support">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 2 11 13"/><path d="M22 2 15 22l-4-9-9-4 20-7z"/></svg>
-        <span>@prr9293</span>
-      </a>
     </header>
     <!-- Mail Mode + Worker config: 1 row, label trên / control dưới -->
     <div class="mail-mode-row">
@@ -166,12 +158,8 @@
   <section class="card card-input">
     <header class="card-head">
       <h2>Input</h2>
-      <a class="card-head-tg" href="https://t.me/prr9293" target="_blank" rel="noopener noreferrer" title="Contact @prr9293 — buy iCloud mail / support">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 2 11 13"/><path d="M22 2 15 22l-4-9-9-4 20-7z"/></svg>
-        <span>@prr9293</span>
-      </a>
     </header>
-    <textarea class="combo-textarea" id="ses-combo-input" placeholder="💬 Need iCloud mail / support? Contact @prr9293 on Telegram (https://t.me/prr9293)&#10;&#10;email@hotmail.com|password123|DNPARKKMM5EYOPDG...&#10;email2@hotmail.com|pass456|I77PEBZQNEBE67SU..."></textarea>
+    <textarea class="combo-textarea" id="ses-combo-input" placeholder="email@hotmail.com|password123|DNPARKKMM5EYOPDG...&#10;email2@hotmail.com|pass456|I77PEBZQNEBE67SU..."></textarea>
     <div class="card-settings">
       <label class="input-group settings-field-compact">
         <span class="input-label">Timeout (s/job)</span>
@@ -237,10 +225,6 @@
   <section class="card card-input">
     <header class="card-head">
       <h2>Input</h2>
-      <a class="card-head-tg" href="https://t.me/prr9293" target="_blank" rel="noopener noreferrer" title="Contact @prr9293 — buy iCloud mail / support">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 2 11 13"/><path d="M22 2 15 22l-4-9-9-4 20-7z"/></svg>
-        <span>@prr9293</span>
-      </a>
       <div class="card-head-actions upi-head-config">
         <label class="input-group config-field-short" title="Số `result=exception` LIÊN TIẾP để trigger restart checkout (lấy link payment mới). Default 1 = mỗi exception là 1 restart. Bộ đếm retry KHÔNG reset qua restart — giữ cộng dồn. 0 = tắt restart (giữ behavior cũ).">
           <span class="input-label">Restart threshold</span>
@@ -260,7 +244,7 @@
         </label>
       </div>
     </header>
-    <textarea class="combo-textarea" id="upi-combo-input" placeholder="💬 Need iCloud mail / support? Contact @prr9293 on Telegram (https://t.me/prr9293)&#10;&#10;email1@nik.edu.pl|GPT#xxx|TOTP_SECRET&#10;email2@nik.edu.pl|GPT#yyy|TOTP_SECRET"></textarea>
+    <textarea class="combo-textarea" id="upi-combo-input" placeholder="email1@nik.edu.pl|GPT#xxx|TOTP_SECRET&#10;email2@nik.edu.pl|GPT#yyy|TOTP_SECRET"></textarea>
     <div class="card-settings">
       <div class="card-settings-row card-settings-row-mixed">
         <label class="input-group config-field-short" title="Số lần retry POST /backend-api/payments/checkout/approve">
@@ -693,12 +677,6 @@
         <p class="settings-hint muted">
           Bot token lấy từ <code>@BotFather</code>. Chat ID là ID cá nhân/nhóm nhận thông báo (lấy qua <code>@userinfobot</code>). Khi bật toggle <strong>Gửi Telegram</strong> ở tab UPI QR, mỗi job thành công sẽ gửi ảnh QR kèm thời gian hết hạn (giờ VN + IN) và 1 tin reply chứa <code>email|pass|secret</code> dạng spoiler.
         </p>
-        <p class="settings-hint muted">
-          💬 Cần mua iCloud mail / support / mua tool? Liên hệ
-          <a href="https://t.me/prr9293" target="_blank" rel="noopener noreferrer"><strong>@prr9293</strong> trên Telegram</a>
-          · Group: <a href="https://t.me/+C6eafntO-Eo1Njdl" target="_blank" rel="noopener noreferrer">t.me/+C6eafntO-Eo1Njdl</a>
-        </p>
-
         <label class="input-group">
           <span class="input-label">Bot token</span>
           <input type="text" id="telegram-bot-token" placeholder="123456:ABC-DEF..." spellcheck="false" autocomplete="off" />
@@ -968,7 +946,7 @@
       <!-- ───── Welcome ───── -->
       <section class="help-section">
         <h4>👋 Welcome</h4>
-        <p>GSH Tool is a <strong>batch ChatGPT signup + 2FA</strong> pipeline with a local web UI. This guide walks you through every tab, mail mode and the most common pitfalls. Stuck? Tap the <span class="help-chip">💬 @prr9293</span> badge anywhere — that opens our Telegram support.</p>
+        <p>GSH Tool is a <strong>batch ChatGPT signup + 2FA</strong> pipeline with a local web UI. This guide walks you through every tab, mail mode and the most common pitfalls.</p>
       </section>
 
       <!-- ───── Quick Start ───── -->
@@ -996,9 +974,9 @@
       <section class="help-section">
         <h4>📧 Mail Modes — pick the right one</h4>
         <ul class="help-list">
-          <li><strong><code>icloud_v3</code></strong> (recommended) — one entry per line: <code>email|api_url</code>. Best detection bypass + fast OTP. Need iCloud mail? <a href="https://t.me/prr9293" target="_blank" rel="noopener noreferrer">Contact @prr9293</a>.</li>
+          <li><strong><code>icloud_v3</code></strong> (recommended) — one entry per line: <code>email|api_url</code>. Best detection bypass + fast OTP.</li>
           <li><strong><code>outlook</code></strong> — Outlook combos: <code>email|password|refresh_token|client_id</code>.</li>
-          <li><strong><code>worker</code></strong> — iCloud email via Worker OTP. Format: just <code>user@icloud.com</code>. Need mail? <a href="https://t.me/prr9293" target="_blank" rel="noopener noreferrer">Contact @prr9293</a>.</li>
+          <li><strong><code>worker</code></strong> — iCloud email via Worker OTP. Format: just <code>user@icloud.com</code>.</li>
           <li><strong><code>gmail_advanced</code></strong> — Gmail through an OTP-fetch API; supports <code>api_url</code> or <code>email|api_url</code> with mail_status pre-check.</li>
         </ul>
       </section>
@@ -1065,7 +1043,6 @@
         <h4>💬 Need help, mail, or want to buy the full tool?</h4>
         <p>Reach out on Telegram — fastest response is always a DM.</p>
         <ul class="help-list">
-          <li>👤 <a href="https://t.me/prr9293" target="_blank" rel="noopener noreferrer"><strong>@prr9293</strong></a> — direct message for sales, custom builds, iCloud mail.</li>
           <li>👥 <a href="https://t.me/+C6eafntO-Eo1Njdl" target="_blank" rel="noopener noreferrer">Telegram community group</a> — tips, updates, discussions.</li>
           <li>💖 Donations welcome — Binance ID <code>356552242</code>, USDT BEP20 <code>0x137a3bfa30ee426127367773dfce16aefce04e02</code>, USDT TRC20 <code>TFy5d1EDT4WBKgtoypx7Ua2dCZhPHMSDNs</code>.</li>
         </ul>
@@ -1074,10 +1051,6 @@
     </div>
 
     <footer class="modal-foot help-modal-foot">
-      <a class="btn btn-primary" href="https://t.me/prr9293" target="_blank" rel="noopener noreferrer">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 2 11 13"/><path d="M22 2 15 22l-4-9-9-4 20-7z"/></svg>
-        Contact @prr9293
-      </a>
       <button class="btn btn-ghost" id="help-modal-done" type="button">Got it</button>
     </footer>
   </div>
@@ -1143,7 +1116,7 @@
       <section class="help-section">
         <h4>⚡ Quick Start (3 steps)</h4>
         <ol class="help-list">
-          <li><strong>Pick a Mail Mode</strong> (top of <em>Reg</em> tab) — iCloud v3 is recommended. Don't have iCloud mails? <a href="https://t.me/prr9293" target="_blank" rel="noopener noreferrer">Contact @prr9293 on Telegram</a> to buy.</li>
+          <li><strong>Pick a Mail Mode</strong> (top of <em>Reg</em> tab) — iCloud v3 is recommended.</li>
           <li><strong>Paste combos</strong> — one entry per line, following the placeholder format shown in the textarea.</li>
           <li><strong>Pick Mode</strong> (top-right: Single / Multi 2/3/5/10/...) and press <strong>Run</strong>. Watch jobs stream in the Jobs panel.</li>
         </ol>
@@ -1162,9 +1135,9 @@
       <section class="help-section">
         <h4>📧 Mail Modes (Reg tab)</h4>
         <dl class="help-dl">
-          <dt>iCloud v3 <span class="help-badge">recommended</span></dt><dd>Each line: <code>email|api_url</code> (Worker v2 readmail URL). Most reliable OTP delivery. Contact <a href="https://t.me/prr9293" target="_blank" rel="noopener noreferrer">@prr9293</a> to buy iCloud mails.</dd>
+          <dt>iCloud v3 <span class="help-badge">recommended</span></dt><dd>Each line: <code>email|api_url</code> (Worker v2 readmail URL). Most reliable OTP delivery.</dd>
           <dt>Outlook</dt><dd>Format <code>email|password|refresh_token|client_id</code>. Useful if you have an Outlook pool already.</dd>
-          <dt>iCloud Worker</dt><dd>Plain iCloud emails, one per line — OTP fetched via shared Worker. Need iCloud mails? <a href="https://t.me/prr9293" target="_blank" rel="noopener noreferrer">@prr9293</a>.</dd>
+          <dt>iCloud Worker</dt><dd>Plain iCloud emails, one per line — OTP fetched via shared Worker.</dd>
           <dt>Gmail (advanced)</dt><dd>Pre-checked Gmail addresses via custom OTP API. Each line: <code>api_url</code> or <code>email|api_url</code>.</dd>
         </dl>
       </section>
@@ -1224,7 +1197,6 @@
         <h4>💬 Need Help, Mails, or the Tool?</h4>
         <p>For iCloud mail purchases, custom tool support, integration help, or anything else — reach out on Telegram:</p>
         <ul class="help-list-compact">
-          <li><strong>DM:</strong> <a href="https://t.me/prr9293" target="_blank" rel="noopener noreferrer">@prr9293</a></li>
           <li><strong>Community group:</strong> <a href="https://t.me/+C6eafntO-Eo1Njdl" target="_blank" rel="noopener noreferrer">t.me/+C6eafntO-Eo1Njdl</a></li>
         </ul>
       </section>
@@ -1232,7 +1204,6 @@
     </div>
 
     <footer class="modal-foot help-modal-foot">
-      <a href="https://t.me/prr9293" target="_blank" rel="noopener noreferrer" class="btn btn-primary">💬 Contact @prr9293</a>
       <button id="help-modal-done" class="btn btn-ghost" type="button">Close</button>
     </footer>
   </div>
@@ -1287,12 +1258,5 @@
 })();
 </script>
 
-<!-- ════════════════ Floating Telegram contact — always visible across all tabs ════════════════ -->
-<a class="telegram-fab" href="https://t.me/prr9293" target="_blank" rel="noopener noreferrer"
-   aria-label="Contact @prr9293 on Telegram"
-   title="💬 Contact @prr9293 on Telegram — buy iCloud mail / support / tool">
-  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 2 11 13"/><path d="M22 2 15 22l-4-9-9-4 20-7z"/></svg>
-  <span class="telegram-fab-label">@prr9293</span>
-</a>
 </body>
 </html>

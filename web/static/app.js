@@ -266,16 +266,16 @@
   });
   const mailModeUiCopy = Object.freeze({
     icloud_v3: {
-      input_help: 'One iCloud v3 entry per line: email|api_url (Worker v2 readmail URL). Need iCloud mail? Contact @prr9293 on Telegram (https://t.me/prr9293) to buy.',
-      input_placeholder: '⚡ Contact @prr9293 on Telegram (https://t.me/prr9293) to buy iCloud mail.\n\nFormat — one entry per line: email|api_url\nExample:\npetunia-boar-3d+hblx3n@icloud.com|https://icloud-cf-mail-v2.n5pskgzs9g.workers.dev/readmail/<token>/data',
+      input_help: 'One iCloud v3 entry per line: email|api_url (Worker v2 readmail URL).',
+      input_placeholder: 'Format — one entry per line: email|api_url\nExample:\npetunia-boar-3d+hblx3n@icloud.com|https://icloud-cf-mail-v2.n5pskgzs9g.workers.dev/readmail/<token>/data',
     },
     outlook: {
       input_help: 'One Outlook combo per line.',
       input_placeholder: 'email|password|refresh_token|client_id',
     },
     worker: {
-      input_help: 'One iCloud email per line via Worker OTP. Need iCloud mail? Contact @prr9293 on Telegram (https://t.me/prr9293) to buy.',
-      input_placeholder: '⚡ Contact @prr9293 on Telegram (https://t.me/prr9293) to buy iCloud mail.\n\nFormat — one iCloud email per line:\nuser@icloud.com',
+      input_help: 'One iCloud email per line via Worker OTP.',
+      input_placeholder: 'Format — one iCloud email per line:\nuser@icloud.com',
     },
     gmail_advanced: {
       input_help: 'Mỗi dòng: api_url hoặc email|api_url. Pre-check mail_status=live.',
