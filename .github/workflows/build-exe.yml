@@ -1,0 +1,183 @@
+name: Build Windows EXE + Installer
+
+# Manual trigger — không tự build mỗi push để không tốn CI minutes.
+# Vào Actions tab → "Build Windows EXE + Installer" → Run workflow → set
+# `hours_valid` rồi click Run. Sau ~10-15 phút artifact sẵn sàng download.
+on:
+  workflow_dispatch:
+    inputs:
+      hours_valid:
+        description: 'Số giờ valid kể từ lúc build xong (default 24)'
+        required: false
+        default: '24'
+        type: string
+      bundle_chromium:
+        description: 'Bundle Chromium vào exe (off = exe nhỏ hơn nhưng cần internet lần đầu)'
+        required: false
+        default: true
+        type: boolean
+
+jobs:
+  build:
+    runs-on: windows-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python 3.13
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+          # KHÔNG cache pip — cache cũ có thể hit từ commit trước (lúc đó
+          # requirements.txt có pyobjc-* fail trên Win) → fresh install mỗi
+          # run an toàn hơn (chậm thêm ~30-60s nhưng không silent skip).
+
+      - name: Install deps + Playwright Chromium
+        run: |
+          $ErrorActionPreference = 'Stop'
+
+          Write-Host "=== Python info ==="
+          python --version
+          Write-Host "Python path: $((Get-Command python).Source)"
+          python -m pip --version
+          Write-Host ""
+
+          Write-Host "=== Upgrade pip (qua python -m pip để tránh PATH ambiguous) ==="
+          python -m pip install --upgrade pip
+          if ($LASTEXITCODE -ne 0) { throw "pip upgrade failed (exit $LASTEXITCODE)" }
+          Write-Host ""
+
+          Write-Host "=== Install requirements-build.txt ==="
+          # KHÔNG dùng requirements.txt vì có pyobjc-* (Mac-only).
+          # python -m pip thay vì 'pip' → đảm bảo cùng interpreter với
+          # 'python -m playwright' phía dưới.
+          python -m pip install --no-cache-dir -r requirements-build.txt
+          if ($LASTEXITCODE -ne 0) { throw "pip install requirements-build.txt failed (exit $LASTEXITCODE)" }
+          Write-Host ""
+
+          Write-Host "=== Install PyInstaller ==="
+          python -m pip install --no-cache-dir pyinstaller==6.10.0
+          if ($LASTEXITCODE -ne 0) { throw "pip install pyinstaller failed (exit $LASTEXITCODE)" }
+          Write-Host ""
+
+          Write-Host "=== Force-reinstall playwright (defensive — ensure module có) ==="
+          python -m pip install --no-cache-dir --force-reinstall playwright==1.49.1
+          if ($LASTEXITCODE -ne 0) { throw "force-reinstall playwright failed (exit $LASTEXITCODE)" }
+          Write-Host ""
+
+          Write-Host "=== pip show playwright (verify metadata) ==="
+          python -m pip show playwright
+          if ($LASTEXITCODE -ne 0) { throw "pip show playwright failed — module không cài được" }
+          Write-Host ""
+
+          Write-Host "=== pip list filter relevant ==="
+          python -m pip list | Select-String -Pattern "playwright|curl-cffi|fastapi|uvicorn|pyinstaller|qrcode|pyotp" -CaseSensitive:$false
+          Write-Host ""
+
+          Write-Host "=== Verify imports ==="
+          # KHÔNG dùng playwright.__version__ (không tồn tại — playwright là
+          # namespace package). Dùng importlib.metadata + import sub-module
+          # thật để chạm site-packages thực tế.
+          python -c "import playwright; from playwright.async_api import async_playwright; from importlib.metadata import version; print('playwright', version('playwright'), '— async_api OK')"
+          if ($LASTEXITCODE -ne 0) { throw "import playwright FAILED" }
+          python -c "import fastapi, uvicorn, curl_cffi, PyInstaller; print('core OK')"
+          if ($LASTEXITCODE -ne 0) { throw "import core deps FAILED" }
+          Write-Host ""
+
+          if ('${{ inputs.bundle_chromium }}' -eq 'true') {
+            Write-Host "=== playwright install chromium ==="
+            python -m playwright install chromium
+            if ($LASTEXITCODE -ne 0) { throw "playwright install chromium failed (exit $LASTEXITCODE)" }
+            Write-Host "Chromium installed at: $env:LOCALAPPDATA\ms-playwright"
+            Get-ChildItem "$env:LOCALAPPDATA\ms-playwright" -Directory | Select-Object Name
+          } else {
+            Write-Host "=== Skip Chromium download (bundle_chromium=false) ==="
+          }
+        shell: pwsh
+
+      - name: Build EXE
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $extra = @()
+          if (-not [System.Convert]::ToBoolean('${{ inputs.bundle_chromium }}')) {
+            $extra += '--no-bundle-chromium'
+          }
+          python scripts/build_exe.py --hours ${{ inputs.hours_valid }} @extra
+          if ($LASTEXITCODE -ne 0) { throw "build_exe.py failed (exit $LASTEXITCODE)" }
+        shell: pwsh
+
+      - name: Verify EXE
+        run: |
+          $ErrorActionPreference = 'Stop'
+          if (-not (Test-Path "dist/GSH.exe")) {
+            throw "dist/GSH.exe not found after build_exe.py"
+          }
+          $size = (Get-Item "dist/GSH.exe").Length / 1MB
+          Write-Host ("EXE size: {0:F1} MB" -f $size)
+        shell: pwsh
+
+      - name: Install Inno Setup
+        run: |
+          $ErrorActionPreference = 'Stop'
+          choco install innosetup --no-progress -y
+          if ($LASTEXITCODE -ne 0) { throw "choco install innosetup failed (exit $LASTEXITCODE)" }
+          # Verify ISCC.exe có thật
+          $iscc = "C:\Program Files (x86)\Inno Setup 6\ISCC.exe"
+          if (-not (Test-Path $iscc)) {
+            throw "ISCC.exe not found at $iscc after install"
+          }
+          Write-Host "Inno Setup installed at: $iscc"
+        shell: pwsh
+
+      - name: Build Installer
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $iscc = "C:\Program Files (x86)\Inno Setup 6\ISCC.exe"
+          # /Q quiet — chỉ in error, KHÔNG flood log với progress.
+          # /O+ chỉ định output dir tường minh (dù installer.iss đã có
+          # OutputDir=..\dist).
+          & $iscc /Q "scripts\installer.iss"
+          if ($LASTEXITCODE -ne 0) { throw "ISCC compile failed (exit $LASTEXITCODE) -- xem error tren" }
+          if (-not (Test-Path "dist/GSH-Setup.exe")) {
+            throw "GSH-Setup.exe not found after ISCC compile"
+          }
+          $size = (Get-Item "dist/GSH-Setup.exe").Length / 1MB
+          Write-Host ("Installer size: {0:F1} MB" -f $size)
+        shell: pwsh
+
+      - name: Upload Installer artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: GSH-Setup-${{ github.sha }}
+          path: dist/GSH-Setup.exe
+          retention-days: 14
+
+      - name: Upload Raw EXE artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: GSH-EXE-${{ github.sha }}
+          path: dist/GSH.exe
+          retention-days: 7
+
+      - name: Build Summary
+        run: |
+          $exeSize = (Get-Item "dist/GSH.exe").Length / 1MB
+          $setupSize = (Get-Item "dist/GSH-Setup.exe").Length / 1MB
+          $hours = '${{ inputs.hours_valid }}'
+          $now = [DateTimeOffset]::Now.ToUnixTimeSeconds()
+          $expire = $now + ([int]$hours * 3600)
+          $expireDt = [DateTimeOffset]::FromUnixTimeSeconds($expire).ToString("yyyy-MM-dd HH:mm:ss UTC")
+          @"
+          ## Build Summary
+
+          | Item | Value |
+          |------|-------|
+          | EXE size | $($exeSize.ToString('F1')) MB |
+          | Installer size | $($setupSize.ToString('F1')) MB |
+          | Valid hours | $hours |
+          | Expires at | $expireDt |
+          | Bundle Chromium | ${{ inputs.bundle_chromium }} |
+          "@ | Out-File -FilePath $env:GITHUB_STEP_SUMMARY -Append
+        shell: pwsh

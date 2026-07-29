@@ -1,0 +1,42 @@
+[1/5] AST parse changed files...
+      ✓ sentinel_sidecar.py
+      ✓ request_phase.py
+      ✓ signup.py
+[2/5] SentinelSidecar API surface...
+      ✓ SentinelSidecar.__init__(*, proxy, headless, locale, log, os_target)
+      ✓ sync methods: start, close, get_sentinel_token, get_so_token, dump_cookies
+      ✓ SentinelSidecarPool: instance, acquire, release, shutdown_all, stats
+      ✓ _SharedBrowser: start, shutdown, add_ref/release_ref, acquire_context/release_context
+      ✓ shared browser uses persistent_context=False (multi-context)
+      ✓ atexit handler registered for clean shutdown
+      ✓ trusted input via page.mouse + page.keyboard (isTrusted=true)
+      ✓ per-context persona rotation (canvas/audio/font/WebGL seeds)
+[3/5] request_phase wiring...
+      ✓ _step_create_account has so_token + sets openai-sentinel-so-token header
+      ✓ _run_request_phase_sync(request, mail_provider, log, on_checkpoint, sidecar)
+      ✓ sidecar.get_sentinel_token called 2× (register + create_account)
+      ✓ sidecar.get_so_token called for create_account
+      ✓ _import_cookies_from_sidecar invoked (register + create_account)
+      ✓ cookie import precedes /register POST
+      ✓ run_request_phase spawns/closes sidecar + REG_SIDECAR_DISABLED env flag
+[4/5] signup.py pure_request warning...
+      ✓ old so-token-missing warning replaced with sidecar note
+[5/5] SentinelSidecar smoke (mocked Camoufox + pool + Phase 11)...
+      → installing mocks...
+      → mocks installed, importing sentinel_sidecar...
+      → sentinel_sidecar imported
+      → starting sidecar...
+      → sidecar started
+      ✓ start() acquires context from shared browser
+      ✓ per-context persona seeds injected via ctx.add_init_script
+      ✓ trusted simulation: mouse.move×2, mouse.click×1, keyboard chars×9
+      ✓ pool stats: 1 browser, ref_count=1
+      ✓ dump_cookies returns 4 cookies (incl. oai-sc/_dd_s)
+      ✓ get_sentinel_token returns oracle JSON
+      ✓ 2nd context got DIFFERENT persona seeds (anti-fleet)
+      ✓ teardown: pool.shutdown_all clean
+      -- sdk.js patch marker verifier --
+      ✓ all 3 markers present → no raise
+      ✓ missing marker → raises SdkPatchOutOfDateError
+
+All Phase 10 (pure-HTTP sidecar) checks passed.

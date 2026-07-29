@@ -1,0 +1,1298 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>GSH Tool · @prr9293 (Telegram)</title>
+<meta name="auth-token" content="__AUTH_TOKEN__" />
+<link rel="stylesheet" href="/static/style.css?v=__ASSET_VERSION__" />
+</head>
+<body data-hide-reg="__HIDE_REG__">
+<header class="topbar">
+  <div class="brand">
+    <span class="brand-dot"></span>
+    <span class="brand-name">GSH</span>
+    <span class="brand-tag">Batch signup + 2FA</span>
+    <a class="brand-telegram" href="https://t.me/prr9293" target="_blank" rel="noopener noreferrer" title="Contact @prr9293 on Telegram — buy iCloud mail / support">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 2 11 13"/><path d="M22 2 15 22l-4-9-9-4 20-7z"/></svg>
+      <span>@prr9293</span>
+    </a>
+  </div>
+  <nav class="tab-nav">
+    <button class="tab-btn active" data-tab="reg">Reg</button>
+    <button class="tab-btn" data-tab="session">Get Session</button>
+    <button class="tab-btn" data-tab="upi">UPI QR</button>
+    <!-- TẠM ẨN: Get Link + HME chưa dùng được. Mở lại = bỏ comment 2 dòng dưới. -->
+    <!-- <button class="tab-btn" data-tab="link">Get Link</button> -->
+    <!-- <button class="tab-btn" data-tab="hme">HME</button> -->
+    <button class="tab-btn" data-tab="settings">Settings</button>
+  </nav>
+  <div class="topbar-actions">
+    <label class="select-wrap">
+      <span>Mode</span>
+      <select id="mode">
+        <option value="single">Single (1)</option>
+        <option value="multi">Multi (2)</option>
+        <option value="multi3">Multi (3)</option>
+        <option value="multi5">Multi (5)</option>
+        <option value="multi10">Multi (10)</option>
+        <option value="multi20">Multi (20)</option>
+        <option value="multi30">Multi (30)</option>
+        <option value="multi50">Multi (50)</option>
+        <option value="multi100">Multi (100)</option>
+        <option value="multi200">Multi (200)</option>
+      </select>
+    </label>
+    <label class="toggle-wrap" title="Bật để ẩn cửa sổ trình duyệt khi chạy">
+      <input type="checkbox" id="headless-toggle" checked />
+      <span class="toggle-track"><span class="toggle-thumb"></span></span>
+      <span class="toggle-label">Headless</span>
+    </label>
+    <label class="toggle-wrap" title="Giữ browser mở sau khi job xong (chỉ khi headed)">
+      <input type="checkbox" id="debug-toggle" />
+      <span class="toggle-track"><span class="toggle-thumb"></span></span>
+      <span class="toggle-label">Debug</span>
+    </label>
+    <span id="status-pill" class="pill pill-idle">idle</span>
+    <button id="btn-help" class="btn-help" type="button" aria-haspopup="dialog" aria-controls="help-modal" title="Help &amp; Guide — How to use GSH Tool">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <circle cx="12" cy="12" r="10"/>
+        <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/>
+        <line x1="12" y1="17" x2="12.01" y2="17"/>
+      </svg>
+      <span>Help</span>
+    </button>
+  </div>
+</header>
+
+<!-- ════════════════ TAB: REG ════════════════ -->
+<main class="grid tab-content active" id="tab-reg">
+  <section class="card card-input">
+    <header class="card-head">
+      <h2>Input Combos</h2>
+      <span class="muted card-head-note" id="input-hint">One combo per line: email|password|refresh_token|client_id</span>
+      <a class="card-head-tg" href="https://t.me/prr9293" target="_blank" rel="noopener noreferrer" title="Contact @prr9293 — buy iCloud mail / support">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 2 11 13"/><path d="M22 2 15 22l-4-9-9-4 20-7z"/></svg>
+        <span>@prr9293</span>
+      </a>
+    </header>
+    <!-- Mail Mode + Worker config: 1 row, label trên / control dưới -->
+    <div class="mail-mode-row">
+      <label class="input-group config-field-mode">
+        <span class="input-label">Mail Mode</span>
+        <select id="mail-mode-select"></select>
+      </label>
+      <label class="input-group config-field-mode">
+        <span class="input-label">Reg Mode</span>
+        <select id="reg-mode-select">
+          <option value="browser">Browser (anti-detect)</option>
+          <option value="hybrid">Hybrid (Firefox HTTP + Camoufox sentinel)</option>
+        </select>
+      </label>
+      <div id="mail-mode-config-host" class="mail-mode-config-host"></div>
+    </div>
+    <textarea class="combo-textarea" id="combo-input" placeholder="email1@hotmail.com|pwd1|M.C548...|9e5f94bc-...&#10;email2@outlook.com|pwd2|M.C525...|9e5f94bc-..."></textarea>
+    <div class="card-settings">
+      <div class="card-settings-row card-settings-row-mixed">
+        <label class="input-group config-field-long">
+          <span class="input-label">Default password</span>
+          <input type="text" id="default-password" placeholder="Leave blank for random" autocomplete="off" spellcheck="false" />
+        </label>
+        <label class="toggle-wrap" title="Bật/tắt áp dụng proxy pool cho Reg jobs. Tắt = chạy direct (no proxy).">
+          <input type="checkbox" id="proxy-toggle" checked />
+          <span class="toggle-track"><span class="toggle-thumb"></span></span>
+          <span class="toggle-label">Proxy</span>
+        </label>
+        <label class="input-group config-field-short">
+          <span class="input-label">Timeout (s/job)</span>
+          <input type="number" id="job-timeout" value="240" min="30" max="600" step="10" />
+        </label>
+      </div>
+    </div>
+    <div class="card-actions">
+      <button id="btn-run" class="btn btn-primary">Run</button>
+      <button id="btn-stop-all" class="btn btn-danger">Stop All</button>
+      <button id="btn-clear-input" class="btn btn-ghost">Clear Input</button>
+      <span class="muted" id="combo-count">0 combos</span>
+    </div>
+  </section>
+
+  <section class="card card-jobs">
+    <header class="card-head">
+      <h2>Jobs</h2>
+      <div class="card-head-actions">
+        <label class="input-group config-field-tiny" title="Số lần retry khi job bị error (0 = không retry)">
+          <span class="input-label">Retry</span>
+          <input type="number" id="auto-retry-max" value="0" min="0" max="10" step="1" />
+        </label>
+        <button id="btn-retry-failed" class="btn btn-ghost btn-small" title="Retry all error & cancelled jobs">Retry Failed</button>
+        <button id="btn-clear-done" class="btn btn-ghost btn-small" title="Remove finished jobs from memory">Clear Done</button>
+        <button id="btn-clear-all" class="btn btn-ghost btn-small" title="Remove ALL jobs (all statuses)">Clear All</button>
+        <span class="muted" id="job-summary">0 total</span>
+      </div>
+    </header>
+    <div id="job-list" class="job-list">
+      <div class="empty">No jobs yet. Paste combos and click Run.</div>
+    </div>
+  </section>
+
+  <section class="card card-log">
+    <header class="card-head">
+      <h2>Log</h2>
+      <span class="muted" id="log-target">-</span>
+    </header>
+    <pre id="log-pane" class="log-pane"></pre>
+  </section>
+
+  <section class="card card-success">
+    <header class="card-head">
+      <h2>Success output</h2>
+      <button id="btn-copy-success" class="btn btn-ghost btn-small">Copy All</button>
+    </header>
+    <pre id="success-pane" class="output-pane">Format: email|password|secret_2fa</pre>
+  </section>
+
+  <section class="card card-error">
+    <header class="card-head">
+      <h2>Error output</h2>
+      <button id="btn-copy-error" class="btn btn-ghost btn-small">Copy All</button>
+    </header>
+    <pre id="error-pane" class="output-pane">No errors yet.</pre>
+  </section>
+</main>
+
+<!-- ════════════════ TAB: GET SESSION ════════════════ -->
+<main class="grid tab-content" id="tab-session">
+  <section class="card card-input">
+    <header class="card-head">
+      <h2>Input</h2>
+      <a class="card-head-tg" href="https://t.me/prr9293" target="_blank" rel="noopener noreferrer" title="Contact @prr9293 — buy iCloud mail / support">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 2 11 13"/><path d="M22 2 15 22l-4-9-9-4 20-7z"/></svg>
+        <span>@prr9293</span>
+      </a>
+    </header>
+    <textarea class="combo-textarea" id="ses-combo-input" placeholder="💬 Need iCloud mail / support? Contact @prr9293 on Telegram (https://t.me/prr9293)&#10;&#10;email@hotmail.com|password123|DNPARKKMM5EYOPDG...&#10;email2@hotmail.com|pass456|I77PEBZQNEBE67SU..."></textarea>
+    <div class="card-settings">
+      <label class="input-group settings-field-compact">
+        <span class="input-label">Timeout (s/job)</span>
+        <input type="number" id="ses-job-timeout" value="120" min="30" max="600" step="10" />
+      </label>
+    </div>
+    <div class="card-actions">
+      <button id="ses-btn-run" class="btn btn-primary">Get Session</button>
+      <button id="ses-btn-stop-all" class="btn btn-danger">Stop All</button>
+      <button id="ses-btn-clear-input" class="btn btn-ghost">Clear Input</button>
+      <span class="muted" id="ses-combo-count">0 combos</span>
+    </div>
+  </section>
+
+  <section class="card card-jobs">
+    <header class="card-head">
+      <h2>Jobs</h2>
+      <div class="card-head-actions">
+        <button id="ses-btn-clear-done" class="btn btn-ghost btn-small">Clear Done</button>
+        <span class="muted" id="ses-job-summary">0 total</span>
+      </div>
+    </header>
+    <div id="ses-job-list" class="job-list">
+      <div class="empty">Paste combos and click Get Session.</div>
+    </div>
+  </section>
+
+  <section class="card card-log">
+    <header class="card-head">
+      <h2>Log</h2>
+      <span class="muted" id="ses-log-target">-</span>
+    </header>
+    <pre id="ses-log-pane" class="log-pane"></pre>
+  </section>
+
+  <section class="card card-success card-ses-free">
+    <header class="card-head">
+      <h2>Free output <span class="muted" id="ses-free-count">0</span></h2>
+      <button id="ses-btn-copy-free" class="btn btn-ghost btn-small">Copy All</button>
+    </header>
+    <pre id="ses-free-pane" class="output-pane">Format: email|password|secret_2fa</pre>
+  </section>
+
+  <section class="card card-success card-ses-plus">
+    <header class="card-head">
+      <h2>Plus output <span class="muted" id="ses-plus-count">0</span></h2>
+      <button id="ses-btn-copy-plus" class="btn btn-ghost btn-small">Copy All</button>
+    </header>
+    <pre id="ses-plus-pane" class="output-pane">Format: email|password|secret_2fa</pre>
+  </section>
+
+  <section class="card card-error card-span-full">
+    <header class="card-head">
+      <h2>Error output</h2>
+      <button id="ses-btn-copy-error" class="btn btn-ghost btn-small">Copy All</button>
+    </header>
+    <pre id="ses-error-pane" class="output-pane">No errors yet.</pre>
+  </section>
+</main>
+
+<!-- ════════════════ TAB: UPI QR ════════════════ -->
+<main class="grid tab-content" id="tab-upi">
+  <section class="card card-input">
+    <header class="card-head">
+      <h2>Input</h2>
+      <a class="card-head-tg" href="https://t.me/prr9293" target="_blank" rel="noopener noreferrer" title="Contact @prr9293 — buy iCloud mail / support">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 2 11 13"/><path d="M22 2 15 22l-4-9-9-4 20-7z"/></svg>
+        <span>@prr9293</span>
+      </a>
+      <div class="card-head-actions upi-head-config">
+        <label class="input-group config-field-short" title="Số `result=exception` LIÊN TIẾP để trigger restart checkout (lấy link payment mới). Default 1 = mỗi exception là 1 restart. Bộ đếm retry KHÔNG reset qua restart — giữ cộng dồn. 0 = tắt restart (giữ behavior cũ).">
+          <span class="input-label">Restart threshold</span>
+          <input type="number" id="upi-restart-threshold" value="1" min="0" max="1000" step="1" />
+        </label>
+        <label class="input-group config-field-short" title="Số lần restart tối đa trong 1 job. Default 500 ≈ approve_retries → không cạn quota. 0 = tắt restart.">
+          <span class="input-label">Max restarts</span>
+          <input type="number" id="upi-max-restarts" value="500" min="0" max="2000" step="1" />
+        </label>
+        <label class="input-group config-field-short" title="Số lần RE-LOGIN tối đa khi MỌI approve attempt của 1 cycle đều bị IP/edge-reject (blocked/403/429). Mỗi cycle = login + checkout + token + IP mới. 1 = tắt (behavior cũ). 2-5 = thử lại với danh tính/IP mới khi cả pool bị chặn.">
+          <span class="input-label">Re-login cycles</span>
+          <input type="number" id="upi-max-outer-cycles" value="1" min="1" max="5" step="1" />
+        </label>
+        <label class="input-group config-field-short" title="Khi Re-login cycles > 1: số approve attempt bị IP/edge-reject (blocked/403/429) LIÊN TIẾP để break cycle sớm và re-login ngay (không đốt hết approve_retries). 0 = tắt (chạy hết approve_retries mới re-login). Default 12.">
+          <span class="input-label">Block-streak</span>
+          <input type="number" id="upi-relogin-block-streak" value="12" min="0" max="1000" step="1" />
+        </label>
+      </div>
+    </header>
+    <textarea class="combo-textarea" id="upi-combo-input" placeholder="💬 Need iCloud mail / support? Contact @prr9293 on Telegram (https://t.me/prr9293)&#10;&#10;email1@nik.edu.pl|GPT#xxx|TOTP_SECRET&#10;email2@nik.edu.pl|GPT#yyy|TOTP_SECRET"></textarea>
+    <div class="card-settings">
+      <div class="card-settings-row card-settings-row-mixed">
+        <label class="input-group config-field-short" title="Số lần retry POST /backend-api/payments/checkout/approve">
+          <span class="input-label">Approve retries</span>
+          <input type="number" id="upi-approve-retries" value="500" min="1" max="2000" step="1" />
+        </label>
+        <label class="input-group config-field-short" title="Timeout cho mỗi job (giây)">
+          <span class="input-label">Timeout (s/job)</span>
+          <input type="number" id="upi-job-timeout" value="1800" min="60" max="7200" step="60" />
+        </label>
+        <label class="input-group config-field-short" title="Step bắt đầu áp proxy (1-6). 1 = login + checkout + stripe + approve via proxy (an toàn khi IP host non-IN). 3 = step 1-2 DIRECT, 3-6 via proxy (default — chỉ ổn nếu IP host hợp lệ).">
+          <span class="input-label">Proxy from step</span>
+          <select id="upi-proxy-from-step">
+            <option value="1">1 — login + all (full proxy)</option>
+            <option value="2">2 — checkout + later</option>
+            <option value="3" selected>3 — stripe_init + later</option>
+            <option value="4">4 — elements + later</option>
+            <option value="5">5 — confirm + approve</option>
+            <option value="6">6 — approve only</option>
+          </select>
+        </label>
+        <label class="input-group config-field-short" title="Delay (giây) giữa 2 lần retry approve. Tối thiểu 2s. Tăng lên 7-10s nếu bị block thường xuyên.">
+          <span class="input-label">Retry delay (s)</span>
+          <input type="number" id="upi-approve-retry-delay" value="2" min="2" max="60" step="1" />
+        </label>
+        <label class="input-group config-field-long" title="Proxy ÁP RIÊNG cho Step 1 (login) + Step 2 (checkout) — dùng khi host IP non-VN/JP cần proxy geo-eligible để ChatGPT trả promo plus. Accept format giống Setting Proxy Pool: 'host:port:user:pass' hoặc 'host:port' hoặc 'scheme://user:pass@host:port'. Template {SID} cho sticky session OK. Bỏ trống = luồng cũ (login DIRECT, Step 2 theo Proxy from step). Proxy dead / format lỗi → tự fallback DIRECT.">
+          <span class="input-label">Login proxy</span>
+          <input type="text" id="upi-login-proxy-url" placeholder="host:port:user:pass  hoặc  http://user:pass@host:port" autocomplete="off" spellcheck="false" />
+        </label>
+        <span class="settings-divider" aria-hidden="true"></span>
+        <label class="toggle-wrap" id="upi-notify-wrap" title="Bật để gửi QR + thông tin account qua Telegram khi job xong">
+          <input type="checkbox" id="upi-notify-toggle" />
+          <span class="toggle-track"><span class="toggle-thumb"></span></span>
+          <span class="toggle-label">Gửi Telegram</span>
+        </label>
+        <!-- <span class="settings-divider" aria-hidden="true"></span>
+        <span class="muted upi-fixed-note" title="Các biến này fix cứng trong code">
+          fixed: PROMO=1 · QR_CONFIRM=1 · QR_APPROVE=1 · APPROVE_DELAY=3s · VARIANTS=qr_code,empty,flow_qr,intent
+        </span> -->
+      </div>
+    </div>
+    <div class="card-actions">
+      <button id="upi-btn-run" class="btn btn-primary">Get UPI QR</button>
+      <button id="upi-btn-stop-all" class="btn btn-danger">Stop All</button>
+      <button id="upi-btn-clear-input" class="btn btn-ghost">Clear Input</button>
+      <span class="muted" id="upi-combo-count">0 combos</span>
+    </div>
+  </section>
+
+  <section class="card card-jobs">
+    <header class="card-head">
+      <h2>Jobs</h2>
+      <div class="card-head-actions">
+        <button id="upi-btn-retry-expired-free" class="btn btn-ghost btn-small" title="Retry mọi job có QR hết hạn nhưng vẫn Free">Retry Expired+Free</button>
+        <button id="upi-btn-retry-failed" class="btn btn-ghost btn-small" title="Retry all error & cancelled jobs">Retry Failed</button>
+        <button id="upi-btn-clear-done" class="btn btn-ghost btn-small">Clear Done</button>
+        <button id="upi-btn-clear-all" class="btn btn-ghost btn-small" title="Xoá TẤT CẢ jobs (mọi trạng thái)">Clear All</button>
+        <button id="upi-btn-clear-cookies" class="btn btn-ghost btn-small" title="Xoá toàn bộ cookie cache UPI — job sau sẽ login lại từ đầu">Clear Cookies</button>
+        <span class="muted" id="upi-job-summary">0 total</span>
+      </div>
+    </header>
+    <div id="upi-job-list" class="job-list">
+      <div class="empty">Paste accounts and click Get UPI QR.</div>
+    </div>
+  </section>
+
+  <section class="card card-log">
+    <header class="card-head">
+      <h2>Log</h2>
+      <span class="muted" id="upi-log-target">-</span>
+    </header>
+    <pre id="upi-log-pane" class="log-pane"></pre>
+  </section>
+
+  <section class="card card-success">
+    <header class="card-head">
+      <h2>Output</h2>
+      <button id="upi-btn-copy-success" class="btn btn-ghost btn-small">Copy All</button>
+    </header>
+    <pre id="upi-success-pane" class="output-pane">Format: email|password|secret_2fa</pre>
+  </section>
+
+  <section class="card card-error">
+    <header class="card-head">
+      <h2>Error output</h2>
+      <button id="upi-btn-copy-error" class="btn btn-ghost btn-small">Copy All</button>
+    </header>
+    <pre id="upi-error-pane" class="output-pane">No errors yet.</pre>
+  </section>
+</main>
+
+<!-- ════════════════ TAB: GET LINK ════════════════ -->
+<main class="grid tab-content" id="tab-link">
+  <section class="card card-input">
+    <header class="card-head">
+      <h2>Input</h2>
+      <div class="link-mode-tabs">
+        <button class="link-mode-btn active" data-mode="combo">Combo</button>
+        <button class="link-mode-btn" data-mode="session_json">Session JSON</button>
+        <button class="link-mode-btn" data-mode="access_token">Access Token</button>
+      </div>
+    </header>
+    <textarea class="combo-textarea" id="link-combo-input" placeholder="email@hotmail.com|password123|DNPARKKMM5EYOPDG...&#10;email2@outlook.com|pass456|I77PEBZQNEBE67SU..." maxlength="50000"></textarea>
+    <div class="card-settings">
+      <div class="card-settings-row card-settings-row-mixed">
+        <label class="input-group config-field-short">
+          <span class="input-label">Region</span>
+          <select id="link-region-select">
+            <option value="VN">Vietnam (VND)</option>
+            <option value="ID">Indonesia (IDR)</option>
+            <option value="IN">India (INR)</option>
+            <option value="US">US (USD)</option>
+          </select>
+        </label>
+        <label class="input-group settings-field-compact">
+          <span class="input-label">Timeout (s/job)</span>
+          <input type="number" id="link-job-timeout" value="180" min="30" max="600" step="10" />
+        </label>
+      </div>
+    </div>
+    <div class="card-actions">
+      <button id="link-btn-run" class="btn btn-primary">Get Link</button>
+      <button id="link-btn-stop-all" class="btn btn-danger">Stop All</button>
+      <button id="link-btn-clear-input" class="btn btn-ghost">Clear Input</button>
+      <span class="muted" id="link-combo-count">0 combos</span>
+    </div>
+  </section>
+
+  <section class="card card-jobs">
+    <header class="card-head">
+      <h2>Jobs</h2>
+      <div class="card-head-actions">
+        <button id="link-btn-clear-done" class="btn btn-ghost btn-small">Clear Done</button>
+        <span class="muted" id="link-job-summary">0 total</span>
+      </div>
+    </header>
+    <div id="link-job-list" class="job-list">
+      <div class="empty">Paste combos and click Get Link.</div>
+    </div>
+  </section>
+
+  <section class="card card-log">
+    <header class="card-head">
+      <h2>Log</h2>
+      <span class="muted" id="link-log-target">-</span>
+    </header>
+    <pre id="link-log-pane" class="log-pane"></pre>
+  </section>
+
+  <section class="card card-error card-span-full">
+    <header class="card-head">
+      <h2>Error output</h2>
+      <button id="link-btn-copy-error" class="btn btn-ghost btn-small">Copy All</button>
+    </header>
+    <pre id="link-error-pane" class="output-pane">No errors yet.</pre>
+  </section>
+</main>
+
+<!-- ════════════════ TAB: HME (icloud-hme-pool, R10 + R14) ════════════════ -->
+<main class="grid tab-content hme-grid" id="tab-hme">
+  <!-- Hàng 1: Profiles (trái) | Jobs (phải) — hiển thị đồng thời -->
+  <!-- Sub-page: Profiles sidebar (icloud-runner-loop task 6.3, R13.5) -->
+  <!-- Operations column (~42% width) thay cho table cũ. Mỗi profile render
+       dạng card với apple_id + badge status + quota bar (hme_count/700).
+       Auto-refresh 30s + lắng nghe LogEvent có payload.apple_id để refresh
+       sớm khi pool transition (active ↔ limited ↔ quota_full ↔ session_expired). -->
+  <section class="card hme-panel hme-panel-profiles" id="hme-page-profiles">
+    <header class="card-head">
+      <h2>Profiles</h2>
+      <div class="card-head-actions">
+        <select id="hme-profile-status-filter" class="hme-select-sm">
+          <option value="">All</option>
+          <option value="active">active</option>
+          <option value="limited">limited</option>
+          <option value="quota_full">quota_full</option>
+          <option value="session_expired">session_expired</option>
+          <option value="disabled">disabled</option>
+          <option value="deleted">deleted</option>
+        </select>
+        <button id="hme-btn-refresh-profiles" class="btn btn-ghost btn-small" title="Refresh profiles">Refresh</button>
+        <button id="hme-btn-pool-status" class="btn btn-ghost btn-small" title="Pool status">Pool</button>
+        <button id="hme-btn-add-profile" class="btn btn-primary btn-small hme-btn-add"
+                title="Add profile (R14): open Camoufox, login, then save/cancel">
+          Add
+        </button>
+      </div>
+    </header>
+    <div id="hme-pool-status-summary" class="muted hme-pool-summary"></div>
+    <div id="hme-profiles-runner-indicator" class="hme-runner-indicator">
+      <span id="hme-profiles-runner-dot" class="runner-dot runner-dot-idle"></span>
+      <span id="hme-profiles-runner-text" class="muted">Idle</span>
+      <button id="hme-btn-privacy" type="button" class="btn btn-ghost btn-small hme-btn-privacy"
+              title="Ẩn/Hiện email + apple_id (chống lộ khi chụp screenshot)">Ẩn</button>
+    </div>
+    <div class="hme-panel-body hme-profile-list-wrap">
+      <div id="hme-profiles-list" class="hme-profile-list">
+        <div class="muted hme-profile-empty">Loading...</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Sub-page: Run Log (icloud-runner-loop task 6.1, R13.1, R13.6) -->
+  <!-- Thay panel Jobs cũ (job list + filter + stop-all + job detail modal)
+       bằng log viewer real-time stream từ HmeRunner. Stream qua
+       GET /api/icloud/run/log/stream (SSE) — auth bằng ?token=<token>
+       query param vì EventSource không cho set header tùy chỉnh. -->
+  <section class="card hme-panel hme-panel-runlog" id="hme-page-runlog">
+    <header class="card-head hme-runner-head">
+      <div class="hme-runner-header-controls" aria-label="Runner controls">
+        <button id="hme-btn-runner-start" class="btn btn-primary btn-small">Start</button>
+        <button id="hme-btn-runner-stop" class="btn btn-danger btn-small" disabled>Stop</button>
+      </div>
+      <div class="card-head-actions">
+        <span id="hme-runner-status-badge" class="badge badge-muted" title="Trạng thái HmeRunner">IDLE</span>
+        <span id="hme-log-stream-status" class="muted hme-log-status" title="EventSource state">disconnected</span>
+        <button id="hme-btn-clear-log" class="btn btn-ghost btn-small" title="Clear viewer (chỉ xoá DOM, không reset buffer server)">Clear</button>
+      </div>
+    </header>
+    <!-- Runner controls (task 6.2 — R13.2, R13.3, R13.4):
+         form chọn action + params, nút Start/Stop, stats live cập nhật từ
+         GET /api/icloud/run/status (poll 2s). -->
+    <div class="hme-runner-controls">
+      <div class="hme-runner-form">
+        <label class="input-group">
+          <span class="input-label">Action</span>
+          <select id="hme-runner-action" class="hme-select-sm">
+            <option value="generate">generate</option>
+            <option value="check_all">check_all</option>
+          </select>
+        </label>
+        <label class="input-group">
+          <span class="input-label">Count / profile</span>
+          <input type="number" id="hme-runner-count-per-cycle" class="hme-input-sm"
+                 min="1" placeholder="drain" title="Số email tối đa mỗi profile mỗi cycle. Để trống = drain tới khi profile hết slot." />
+        </label>
+        <label class="input-group">
+          <span class="input-label">Retry interval (s)</span>
+          <input type="number" id="hme-runner-retry-interval" class="hme-input-sm"
+                 min="10" placeholder="900" />
+        </label>
+        <label class="input-group">
+          <span class="input-label">Label</span>
+          <input type="text" id="hme-runner-label" class="hme-input-sm"
+                 placeholder="optional" autocomplete="off" />
+        </label>
+        <label class="input-group">
+          <span class="input-label">Note</span>
+          <input type="text" id="hme-runner-note" class="hme-input-sm"
+                 placeholder="optional" autocomplete="off" />
+        </label>
+      </div>
+      <div id="hme-runner-stats" class="hme-runner-stats muted">
+        Cycle <span id="hme-runner-stats-cycle">#0</span>
+        | Created: <span id="hme-runner-stats-created">0</span>
+        | Errors: <span id="hme-runner-stats-errors">0</span>
+        | Skipped: <span id="hme-runner-stats-skipped">0</span>
+        <span
+          id="hme-runner-next-cycle-countdown"
+          class="hme-runner-countdown"
+          style="display:none;"
+          title="Thời gian còn lại tới cycle kế tiếp (R13.7)"
+        ></span>
+      </div>
+    </div>
+    <pre id="hme-log-pane" class="log-pane hme-log-pane"></pre>
+  </section>
+
+  <!-- Hàng 2: Emails (full-width) -->
+  <!-- Sub-page: Emails (R10.5, R10.15) -->
+  <section class="card hme-panel hme-panel-emails" id="hme-page-emails">
+    <header class="card-head">
+      <h2>Emails</h2>
+      <div class="card-head-actions">
+        <select id="hme-email-status-filter" class="hme-select-sm">
+          <option value="">All status</option>
+          <option value="created">created</option>
+          <option value="reconciled">reconciled</option>
+          <option value="deactivated">deactivated</option>
+          <option value="deleted">deleted</option>
+          <option value="disabled">disabled</option>
+          <option value="used_for_chatgpt">used_for_chatgpt</option>
+        </select>
+        <input type="text" id="hme-email-apple-id-filter" placeholder="apple_id..." class="hme-input-sm" />
+        <input type="text" id="hme-email-label-filter" placeholder="label..." class="hme-input-sm" />
+        <button id="hme-btn-refresh-emails" class="btn btn-ghost btn-small" title="Refresh">Refresh</button>
+      </div>
+    </header>
+    <div class="table-wrap hme-panel-body">
+      <table class="hme-table">
+        <thead>
+          <tr>
+            <th><input type="checkbox" id="hme-email-select-all" /></th>
+            <th>email</th>
+            <th>apple_id</th>
+            <th>status</th>
+            <th>label</th>
+            <th>created_at</th>
+            <th>action</th>
+          </tr>
+        </thead>
+        <tbody id="hme-emails-tbody">
+          <tr><td colspan="7" class="muted">Click Refresh to load.</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div id="hme-bulk-actions" class="hme-bulk-bar" style="display:none;">
+      <span class="muted" id="hme-bulk-count">0 selected</span>
+      <button class="btn btn-ghost btn-small" data-action="deactivate">Deactivate</button>
+      <button class="btn btn-ghost btn-small" data-action="reactivate">Reactivate</button>
+      <button class="btn btn-ghost btn-small" data-action="delete">Delete</button>
+      <label class="toggle-wrap">
+        <input type="checkbox" id="hme-bulk-dry-run" />
+        <span class="toggle-label">Dry run</span>
+      </label>
+    </div>
+    <div id="hme-email-pagination" class="hme-pagination"></div>
+  </section>
+
+  <!-- ── Sub-panel: Auto Reg GPT (auto-reg-gpt) ── -->
+  <section class="card hme-panel hme-panel-autoreg" id="hme-page-autoreg">
+    <header class="card-head autoreg-head">
+      <h2>Auto Reg GPT</h2>
+      <div class="autoreg-head-controls">
+        <label class="autoreg-inline-label">Workers <input type="number" id="autoreg-concurrency" class="hme-input-sm" value="1" min="1" max="5" step="1" style="width:60px;" title="Concurrency (1-5)" /></label>
+        <label class="autoreg-inline-label">Poll(s) <input type="number" id="autoreg-poll-interval" class="hme-input-sm" value="30" min="10" step="5" style="width:64px;" title="Poll interval (s)" /></label>
+        <button id="autoreg-toggle" class="btn btn-primary btn-small">Start</button>
+        <span id="autoreg-status-badge" class="badge badge-muted">IDLE</span>
+        <button id="autoreg-copy-output" class="btn btn-ghost btn-small" title="Copy output">Copy</button>
+      </div>
+    </header>
+    <pre id="autoreg-output-pane" class="log-pane autoreg-output-pane">Output: email|password|secret_2fa</pre>
+    <div class="autoreg-stats muted">
+      Cycle <span id="autoreg-stats-cycle">#0</span>
+      | Processed: <span id="autoreg-stats-processed">0</span>
+      | Success: <span id="autoreg-stats-success">0</span>
+      | Errors: <span id="autoreg-stats-errors">0</span>
+    </div>
+  </section>
+</main>
+
+<!-- ════════════════ TAB: SETTINGS ════════════════ -->
+<main class="tab-content settings-layout" id="tab-settings">
+  <!-- Sidebar dọc: danh sách nhóm cấu hình -->
+  <aside class="settings-sidebar" role="tablist" aria-label="Settings sections">
+    <button class="settings-nav-item active" data-settings-section="proxies" role="tab" aria-selected="true">
+      <span class="settings-nav-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+      </span>
+      <span class="settings-nav-label">Proxies</span>
+    </button>
+    <button class="settings-nav-item" data-settings-section="telegram" role="tab" aria-selected="false">
+      <span class="settings-nav-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 2 11 13"/><path d="M22 2 15 22l-4-9-9-4 20-7z"/></svg>
+      </span>
+      <span class="settings-nav-label">Telegram</span>
+    </button>
+    <button class="settings-nav-item" data-settings-section="tunnel" role="tab" aria-selected="false">
+      <span class="settings-nav-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12h6"/><path d="M16 12h6"/><path d="M12 2v6"/><path d="M12 16v6"/><circle cx="12" cy="12" r="4"/></svg>
+      </span>
+      <span class="settings-nav-label">Tunnel</span>
+    </button>
+  </aside>
+
+  <!-- Content pane -->
+  <div class="settings-content">
+    <!-- ── Section: Proxies ── -->
+    <section class="card settings-section active" id="settings-section-proxies" data-settings-pane="proxies">
+      <header class="card-head">
+        <h2>Proxies</h2>
+        <div class="card-head-actions">
+          <label class="input-group config-field-tiny" title="Cách chọn proxy mỗi lần chạy">
+            <span class="input-label">Rotation</span>
+            <select id="proxy-pool-mode" class="hme-select-sm">
+              <option value="round_robin">Round-robin</option>
+              <option value="random">Random</option>
+              <option value="probe">Probe (health-check)</option>
+            </select>
+          </label>
+          <span id="proxy-pool-summary" class="badge badge-muted" title="Tổng / live / dead">0 proxy</span>
+        </div>
+      </header>
+
+      <div class="settings-section-body">
+        <label class="input-group" id="login-flow-field" title="Flow login pure-HTTP (TOÀN CỤC — áp cho UPI + Get Session + Link login + CLI). anti409 = warm + pre-set oai-did + auth_session_logging_id + sentinel password_verify, chống HTTP 409 invalid_state (tốt cho batch password combo). legacy = authorize/continue fallback (dò được passwordless/OTP khi landing không rõ).">
+          <span class="input-label">Login flow (toàn cục)</span>
+          <select id="login-flow-select" class="hme-select-sm">
+            <option value="anti409">anti409 — chống HTTP 409 (mặc định)</option>
+            <option value="legacy">legacy — authorize/continue (passwordless/OTP)</option>
+          </select>
+        </label>
+        <p class="settings-hint muted">
+          Áp cho mọi flow login pure-HTTP. <strong>anti409</strong>: tốt cho batch password combo.
+          <strong>legacy</strong>: dùng khi có account passwordless/OTP mà landing không rõ.
+        </p>
+        <span class="settings-divider" aria-hidden="true"></span>
+
+        <p class="settings-hint muted">
+          Mỗi dòng 1 proxy, hỗ trợ 3 dạng:
+          <code>host:port:user:pass</code> ·
+          <code>host:port:user-SID{SID}:pass</code> (SID xoay IP) ·
+          <code>http://user:pass@host:port</code> (URL cũ vẫn nhận).
+          Token <code>{SID}</code> (hoặc <code>{sid}</code> — không phân biệt hoa/thường) sinh ngẫu nhiên mỗi lần dùng; mọi vị trí <code>{SID}</code> trong 1 dòng dùng <strong>cùng 1 token</strong>.
+          Tool xoay vòng (round-robin/random) để tránh trùng IP; proxy lỗi auth/host tự bị loại. Để trống = chạy direct.
+        </p>
+
+        <!-- Repeater rows -->
+        <div id="proxy-pool-rows" class="proxy-pool-rows"></div>
+
+        <div class="proxy-pool-toolbar">
+          <button id="proxy-pool-add" class="btn btn-ghost btn-small" type="button">+ Thêm proxy</button>
+          <button id="proxy-pool-paste" class="btn btn-ghost btn-small" type="button" title="Dán nhiều proxy (mỗi dòng 1)">Dán hàng loạt</button>
+          <span class="settings-toolbar-spacer"></span>
+          <button id="proxy-pool-test-all" class="btn btn-ghost btn-small" type="button">Test All</button>
+          <button id="proxy-pool-save" class="btn btn-primary btn-small" type="button">Lưu</button>
+        </div>
+
+        <div id="proxy-pool-status" class="proxy-pool-status muted"></div>
+      </div>
+    </section>
+
+    <!-- ── Section: Telegram ── -->
+    <section class="card settings-section" id="settings-section-telegram" data-settings-pane="telegram">
+      <header class="card-head">
+        <h2>Telegram</h2>
+        <span id="telegram-status-badge" class="badge badge-muted">chưa cấu hình</span>
+      </header>
+
+      <div class="settings-section-body">
+        <p class="settings-hint muted">
+          Bot token lấy từ <code>@BotFather</code>. Chat ID là ID cá nhân/nhóm nhận thông báo (lấy qua <code>@userinfobot</code>). Khi bật toggle <strong>Gửi Telegram</strong> ở tab UPI QR, mỗi job thành công sẽ gửi ảnh QR kèm thời gian hết hạn (giờ VN + IN) và 1 tin reply chứa <code>email|pass|secret</code> dạng spoiler.
+        </p>
+        <p class="settings-hint muted">
+          💬 Cần mua iCloud mail / support / mua tool? Liên hệ
+          <a href="https://t.me/prr9293" target="_blank" rel="noopener noreferrer"><strong>@prr9293</strong> trên Telegram</a>
+          · Group: <a href="https://t.me/+C6eafntO-Eo1Njdl" target="_blank" rel="noopener noreferrer">t.me/+C6eafntO-Eo1Njdl</a>
+        </p>
+
+        <label class="input-group">
+          <span class="input-label">Bot token</span>
+          <input type="text" id="telegram-bot-token" placeholder="123456:ABC-DEF..." spellcheck="false" autocomplete="off" />
+        </label>
+        <label class="input-group">
+          <span class="input-label">Chat ID</span>
+          <input type="text" id="telegram-chat-id" placeholder="vd: 123456789 hoặc -100123..." spellcheck="false" autocomplete="off" />
+        </label>
+
+        <div class="proxy-pool-toolbar">
+          <span class="settings-toolbar-spacer"></span>
+          <button id="telegram-test" class="btn btn-ghost btn-small" type="button">Gửi test</button>
+          <button id="telegram-save" class="btn btn-primary btn-small" type="button">Lưu</button>
+        </div>
+
+        <div id="telegram-status" class="proxy-pool-status muted"></div>
+      </div>
+    </section>
+
+    <!-- ── Section: Tunnel ── -->
+    <section class="card settings-section" id="settings-section-tunnel" data-settings-pane="tunnel">
+      <header class="card-head">
+        <h2>Cloudflare Quick Tunnel</h2>
+        <span id="tunnel-status-badge" class="badge badge-muted">stopped</span>
+      </header>
+
+      <div class="settings-section-body">
+        <p class="settings-hint muted">
+          Bật để tạo URL công khai <code>https://*.trycloudflare.com</code> trỏ về web UI local — truy cập từ thiết bị khác/Internet không cần mở port.
+          Mỗi lần bật cấp 1 URL ngẫu nhiên (không cần Cloudflare account). Tool tự tải <code>cloudflared</code> binary lần đầu (Win/Mac/Linux, x64/arm64).
+          <strong>Lưu ý:</strong> URL public bypass firewall — đảm bảo <strong>Auth token</strong> đã đặt và không chia sẻ link bừa bãi.
+        </p>
+
+        <label class="input-group" id="tunnel-toggle-row" title="Bật/tắt Cloudflare Quick Tunnel">
+          <span class="input-label">Trạng thái</span>
+          <label class="toggle-wrap" style="margin-left: 0;">
+            <input type="checkbox" id="tunnel-enabled-toggle" />
+            <span class="toggle-track"><span class="toggle-thumb"></span></span>
+            <span class="toggle-label" id="tunnel-toggle-label">Đang tắt</span>
+          </label>
+        </label>
+
+        <label class="input-group" id="tunnel-url-row">
+          <span class="input-label">Public URL</span>
+          <div class="tunnel-url-box">
+            <input type="text" id="tunnel-url-input" readonly placeholder="(chưa có URL — bật tunnel để cấp)" spellcheck="false" />
+            <button id="tunnel-url-copy" class="btn btn-ghost btn-small" type="button" disabled>Copy</button>
+            <button id="tunnel-url-open" class="btn btn-ghost btn-small" type="button" disabled>Mở</button>
+          </div>
+        </label>
+
+        <div class="proxy-pool-toolbar">
+          <span class="settings-toolbar-spacer"></span>
+          <button id="tunnel-restart" class="btn btn-ghost btn-small" type="button" disabled>Cấp URL mới</button>
+        </div>
+
+        <div id="tunnel-status-line" class="proxy-pool-status muted"></div>
+
+        <details class="tunnel-log-details">
+          <summary class="muted">Log cloudflared (20 dòng cuối)</summary>
+          <pre id="tunnel-log-tail" class="tunnel-log-tail"></pre>
+        </details>
+      </div>
+    </section>
+  </div>
+</main>
+
+<!-- Bulk-paste proxy dialog -->
+<div id="proxy-paste-modal" class="modal" style="display:none;" role="dialog" aria-modal="true" aria-labelledby="proxy-paste-title">
+  <div class="modal-content modal-content-md">
+    <header class="modal-head">
+      <h3 id="proxy-paste-title">Dán nhiều proxy</h3>
+      <button id="proxy-paste-close" class="btn-icon" aria-label="Close" title="Đóng">×</button>
+    </header>
+    <div class="modal-body">
+      <p class="muted">Mỗi dòng 1 proxy. Dòng trùng sẽ tự bỏ qua.</p>
+      <textarea id="proxy-paste-textarea" class="combo-textarea proxy-paste-textarea"
+        placeholder="http://user:pass@host:port&#10;http://user2:pass2@host2:port2"
+        spellcheck="false"></textarea>
+    </div>
+    <footer class="modal-foot">
+      <button id="proxy-paste-cancel" class="btn btn-ghost">Huỷ</button>
+      <button id="proxy-paste-apply" class="btn btn-primary">Thêm vào danh sách</button>
+    </footer>
+  </div>
+</div>
+
+<!-- HME feedback / confirm dialog -->
+<div id="hme-feedback-modal" class="modal hme-feedback-modal" style="display:none;" role="dialog" aria-modal="true" aria-labelledby="hme-feedback-title">
+  <div class="modal-content modal-content-sm">
+    <header class="modal-head">
+      <h3 id="hme-feedback-title">Thông báo</h3>
+      <button id="hme-feedback-close" class="btn-icon" aria-label="Close" title="Đóng">×</button>
+    </header>
+    <div class="modal-body">
+      <p id="hme-feedback-message" class="hme-feedback-message"></p>
+      <pre id="hme-feedback-detail" class="hme-feedback-detail" style="display:none;"></pre>
+    </div>
+    <footer class="modal-foot hme-feedback-actions" id="hme-feedback-actions"></footer>
+  </div>
+</div>
+
+<!-- HME Add Profile dialog (R14) -->
+<div id="hme-add-profile-modal" class="modal" style="display:none;">
+  <div class="modal-content modal-content-md">
+    <header class="modal-head">
+      <h3>Đang ghi profile mới</h3>
+      <button id="hme-add-modal-close" class="btn-icon" aria-label="Close" title="Đóng (vẫn giữ session chạy nền)">×</button>
+    </header>
+    <div class="modal-body">
+      <div id="hme-add-instructions" class="hme-add-instructions">
+        <ol>
+          <li>Camoufox đã mở. <strong>Login Apple ID + nhập 2FA</strong> tay.</li>
+          <li>Đợi tới khi vào được iCloud webapp (Mail / Settings / Drive).</li>
+          <li>Nhập <strong>Apple ID</strong> bên dưới rồi bấm <strong>Lưu</strong> để chốt profile, hoặc <strong>Huỷ</strong> để đóng browser + xoá profile đang ghi.</li>
+        </ol>
+      </div>
+      <label class="hme-add-input-row">
+        <span>Apple ID (email)</span>
+        <input
+          type="email"
+          id="hme-add-apple-id"
+          placeholder="vd: user@icloud.com"
+          autocomplete="off"
+          spellcheck="false"
+        />
+        <small class="muted">
+          Tự nhập email Apple ID đã login trong Camoufox. Bỏ trống → tool thử auto-extract (best-effort, có thể fail).
+        </small>
+      </label>
+      <div class="hme-add-status">
+        <div class="hme-add-status-row">
+          <span class="muted">Session ID:</span>
+          <code id="hme-add-session-id">-</code>
+        </div>
+        <div class="hme-add-status-row">
+          <span class="muted">State:</span>
+          <span id="hme-add-state-badge"><span class="badge badge-muted">-</span></span>
+        </div>
+        <div class="hme-add-status-row">
+          <span class="muted">Đã chạy:</span>
+          <span id="hme-add-duration">0s</span>
+          <span class="muted hme-add-timeout-hint" id="hme-add-timeout-hint"></span>
+        </div>
+        <div class="hme-add-status-row hme-add-error-row" id="hme-add-error-row" style="display:none;">
+          <span class="muted">Lỗi:</span>
+          <span id="hme-add-error-text" class="hme-add-error-text"></span>
+        </div>
+      </div>
+    </div>
+    <footer class="modal-foot">
+      <button id="hme-add-cancel-btn" class="btn btn-ghost">Huỷ</button>
+      <button id="hme-add-save-btn" class="btn btn-primary" disabled>Lưu</button>
+    </footer>
+  </div>
+</div>
+
+<!-- HME Open Profile dialog (R15) -->
+<div id="hme-open-profile-modal" class="modal" style="display:none;">
+  <div class="modal-content modal-content-md">
+    <header class="modal-head">
+      <h3 id="hme-open-modal-title">Đang mở profile</h3>
+      <button id="hme-open-modal-close" class="btn-icon" aria-label="Close" title="Đóng dialog (vẫn giữ session chạy nền)">×</button>
+    </header>
+    <div class="modal-body">
+      <div class="hme-add-instructions">
+        <ol>
+          <li>Camoufox đã mở profile của bạn. <strong>Kiểm tra trạng thái session</strong> trên iCloud bằng mắt.</li>
+          <li>Nếu Apple yêu cầu <strong>login lại / 2FA</strong>, hãy hoàn tất tay trong cửa sổ Camoufox.</li>
+          <li>Khi xong:
+            <ul>
+              <li><strong>Lưu</strong> → verify cookies + reactivate profile (nếu đang <code>session_expired</code>/<code>limited</code>/<code>quota_full</code>/<code>disabled</code>).</li>
+              <li><strong>Đóng</strong> → đóng browser, KHÔNG đổi DB (chỉ xem).</li>
+            </ul>
+          </li>
+        </ol>
+      </div>
+      <div class="hme-add-status">
+        <div class="hme-add-status-row">
+          <span class="muted">Apple ID:</span>
+          <code id="hme-open-apple-id">-</code>
+        </div>
+        <div class="hme-add-status-row">
+          <span class="muted">Session ID:</span>
+          <code id="hme-open-session-id">-</code>
+        </div>
+        <div class="hme-add-status-row">
+          <span class="muted">State:</span>
+          <span id="hme-open-state-badge"><span class="badge badge-muted">-</span></span>
+        </div>
+        <div class="hme-add-status-row">
+          <span class="muted">Status DB:</span>
+          <span id="hme-open-previous-status" class="muted">-</span>
+        </div>
+        <div class="hme-add-status-row">
+          <span class="muted">Đã chạy:</span>
+          <span id="hme-open-duration">0s</span>
+        </div>
+        <div class="hme-add-status-row hme-add-error-row" id="hme-open-error-row" style="display:none;">
+          <span class="muted">Lỗi:</span>
+          <span id="hme-open-error-text" class="hme-add-error-text"></span>
+        </div>
+      </div>
+    </div>
+    <footer class="modal-foot">
+      <button id="hme-open-close-btn" class="btn btn-ghost">Đóng</button>
+      <button id="hme-open-save-btn" class="btn btn-primary" disabled>Lưu</button>
+    </footer>
+  </div>
+</div>
+
+<!-- UPI QR view modal -->
+<div id="upi-qr-modal" class="modal" style="display:none;" role="dialog" aria-modal="true" aria-labelledby="upi-qr-modal-title">
+  <div class="modal-content modal-content-md upi-qr-modal-content">
+    <header class="modal-head">
+      <h3 id="upi-qr-modal-title">UPI QR</h3>
+      <button id="upi-qr-modal-close" class="btn-icon" aria-label="Close" title="Đóng">×</button>
+    </header>
+    <div class="modal-body upi-qr-modal-body">
+      <div class="upi-qr-modal-image-wrap">
+        <img id="upi-qr-modal-img" alt="UPI QR" />
+      </div>
+      <div class="upi-qr-modal-meta">
+        <div class="upi-qr-modal-row"><span class="muted">Email:</span> <code id="upi-qr-modal-email">-</code></div>
+        <div class="upi-qr-modal-row"><span class="muted">Amount:</span> <span id="upi-qr-modal-amount">-</span></div>
+        <div class="upi-qr-modal-row"><span class="muted">Source:</span> <span id="upi-qr-modal-source">-</span></div>
+        <div class="upi-qr-modal-row"><span class="muted">Checkout:</span> <code id="upi-qr-modal-cs">-</code></div>
+        <div class="upi-qr-modal-row"><span class="muted">Link TT:</span> <a id="upi-qr-modal-paylink" href="#" target="_blank" rel="noopener noreferrer" style="display:none;word-break:break-all;">mở link UPI</a><span id="upi-qr-modal-paylink-empty">-</span></div>
+        <div class="upi-qr-modal-row"><span class="muted">Hết hạn sau:</span> <span id="upi-qr-modal-countdown" class="upi-countdown">-</span></div>
+        <div class="upi-qr-modal-row"><span class="muted">Hết hạn (VN):</span> <span id="upi-qr-modal-exp-vn">-</span></div>
+        <div class="upi-qr-modal-row"><span class="muted">Hết hạn (IN):</span> <span id="upi-qr-modal-exp-in">-</span></div>
+      </div>
+    </div>
+    <footer class="modal-foot">
+      <button id="upi-qr-modal-copy-img" class="btn btn-ghost" type="button">Copy QR</button>
+      <button id="upi-qr-modal-copy-link" class="btn btn-primary" type="button" style="display:none;">Copy link payment</button>
+      <button id="upi-qr-modal-open" class="btn btn-ghost" type="button">Mở tab mới</button>
+      <button id="upi-qr-modal-ok" class="btn btn-primary" type="button">Đóng</button>
+    </footer>
+  </div>
+</div>
+
+<script src="/static/dialog.js?v=__ASSET_VERSION__"></script>
+<script src="/static/settings.js?v=__ASSET_VERSION__"></script>
+<script src="/static/app.js?v=__ASSET_VERSION__"></script>
+<script src="/static/session.js?v=__ASSET_VERSION__"></script>
+<script src="/static/link.js?v=__ASSET_VERSION__"></script>
+<script src="/static/hme.js?v=__ASSET_VERSION__"></script>
+<script src="/static/autoreg.js?v=__ASSET_VERSION__"></script>
+<script src="/static/upi.js?v=__ASSET_VERSION__"></script>
+<script src="/static/bulk.js?v=__ASSET_VERSION__"></script>
+<script src="/static/settings_panel.js?v=__ASSET_VERSION__"></script>
+
+<!-- ════════════════ Help Modal — friendly user guide (opens from header) ════════════════ -->
+<div class="modal help-modal" id="help-modal" hidden role="dialog" aria-modal="true" aria-labelledby="help-modal-title">
+  <div class="modal-content help-modal-content" role="document">
+    <header class="modal-head help-modal-head">
+      <h3 id="help-modal-title">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+        GSH Tool — Help &amp; Guide
+      </h3>
+      <button class="modal-close help-modal-close" id="help-modal-close" type="button" aria-label="Close help">×</button>
+    </header>
+
+    <div class="modal-body help-modal-body">
+
+      <!-- ───── Welcome ───── -->
+      <section class="help-section">
+        <h4>👋 Welcome</h4>
+        <p>GSH Tool is a <strong>batch ChatGPT signup + 2FA</strong> pipeline with a local web UI. This guide walks you through every tab, mail mode and the most common pitfalls. Stuck? Tap the <span class="help-chip">💬 @prr9293</span> badge anywhere — that opens our Telegram support.</p>
+      </section>
+
+      <!-- ───── Quick Start ───── -->
+      <section class="help-section">
+        <h4>🚀 Quick Start — your first signup in 3 steps</h4>
+        <ol class="help-list">
+          <li><strong>Open the Reg tab.</strong> Pick a <em>Mail Mode</em> (we recommend <code>icloud_v3</code> — see the Mail Modes section). Paste your combos into the textarea — one per line.</li>
+          <li><strong>Choose Reg Mode and Mode.</strong> <code>Hybrid</code> is the safest balance of speed and anti-detect. The Mode dropdown in the header controls how many jobs run in parallel (Single, Multi 5, Multi 30…).</li>
+          <li><strong>Press <code>Start</code>.</strong> Watch live progress in the Jobs card, raw logs in the Log card, and successful credentials drop into the Free / Plus output panes — ready to copy.</li>
+        </ol>
+      </section>
+
+      <!-- ───── Tabs ───── -->
+      <section class="help-section">
+        <h4>🗂️ Tabs at a glance</h4>
+        <ul class="help-list">
+          <li><strong>Reg</strong> — create new ChatGPT accounts in bulk, with 2FA auto-enabled.</li>
+          <li><strong>Get Session</strong> — paste <code>email|password|totp_secret</code> combos and harvest fresh <code>session.json</code> + access tokens.</li>
+          <li><strong>UPI QR</strong> — turn an account into a payable UPI QR (India ChatGPT Plus checkout). Optional Telegram delivery of the QR + credentials.</li>
+          <li><strong>Settings</strong> — proxy pool, Telegram bot, Cloudflare quick tunnel and a few more knobs.</li>
+        </ul>
+      </section>
+
+      <!-- ───── Mail Modes ───── -->
+      <section class="help-section">
+        <h4>📧 Mail Modes — pick the right one</h4>
+        <ul class="help-list">
+          <li><strong><code>icloud_v3</code></strong> (recommended) — one entry per line: <code>email|api_url</code>. Best detection bypass + fast OTP. Need iCloud mail? <a href="https://t.me/prr9293" target="_blank" rel="noopener noreferrer">Contact @prr9293</a>.</li>
+          <li><strong><code>outlook</code></strong> — Outlook combos: <code>email|password|refresh_token|client_id</code>.</li>
+          <li><strong><code>worker</code></strong> — iCloud email via Worker OTP. Format: just <code>user@icloud.com</code>. Need mail? <a href="https://t.me/prr9293" target="_blank" rel="noopener noreferrer">Contact @prr9293</a>.</li>
+          <li><strong><code>gmail_advanced</code></strong> — Gmail through an OTP-fetch API; supports <code>api_url</code> or <code>email|api_url</code> with mail_status pre-check.</li>
+        </ul>
+      </section>
+
+      <!-- ───── Reg Modes ───── -->
+      <section class="help-section">
+        <h4>⚙️ Reg Modes — Browser vs Hybrid</h4>
+        <ul class="help-list">
+          <li><strong>Browser</strong> — full Camoufox flow. Slowest but easiest to verify visually. Use Headless OFF + Debug ON when developing.</li>
+          <li><strong>Hybrid</strong> (recommended) — Camoufox handles auth + sentinel tokens, pure HTTP runs the rest. Fast and stealthy at the same time.</li>
+        </ul>
+        <p class="help-muted">Headless toggle hides the browser window. Debug toggle keeps the browser open after the job finishes — useful for inspecting failed runs.</p>
+      </section>
+
+      <!-- ───── Pricing tip ───── -->
+      <section class="help-section help-section-warn">
+        <h4>💰 Get the cheap ChatGPT Plus price (40–60% off)</h4>
+        <p>ChatGPT Plus uses purchasing-power-parity pricing. To get the best deal, the <strong>login traffic must exit from Vietnam (VN) or Japan (JP)</strong>.</p>
+        <ul class="help-list">
+          <li>✅ Easiest: rent a JP/VN VPS (Vultr Tokyo ~$5/month) and run the tool there — no proxy needed.</li>
+          <li>✅ Alternative: install a JP/VN VPN on the device running the tool. ProtonVPN free tier includes a free Japan node.</li>
+          <li>✅ Production: configure proxy pool in <strong>Settings → Proxies</strong> with VN/JP residential proxies.</li>
+          <li>⛔ Running from US/EU without a JP/VN exit IP → Plus price is 2–3× higher and UPI/GoPay may be geo-blocked.</li>
+        </ul>
+      </section>
+
+      <!-- ───── UPI ───── -->
+      <section class="help-section">
+        <h4>💳 UPI QR (India payment)</h4>
+        <p>UPI lets Indian ChatGPT accounts pay for Plus instantly via PhonePe / GPay / Paytm.</p>
+        <ol class="help-list">
+          <li>Open the <strong>UPI QR</strong> tab and paste <code>email|password|totp_secret</code> combos (one per line).</li>
+          <li>Tune <em>Approve retries</em>, <em>Restart threshold</em>, <em>Re-login cycles</em>, and <em>Block-streak</em> if you hit rate limits.</li>
+          <li>Optionally enable <strong>Send Telegram</strong> — each successful job DMs the QR + credentials to your configured chat.</li>
+          <li>Press <code>Start</code>. QR pops up in a modal as soon as the checkout is ready.</li>
+        </ol>
+        <p class="help-muted">For high-volume UPI generation, look at the standalone <code>rust_upi_bot/</code> — it runs as a Telegram bot with a worker pool and per-user limits.</p>
+      </section>
+
+      <!-- ───── Settings ───── -->
+      <section class="help-section">
+        <h4>🔧 Settings deep dive</h4>
+        <ul class="help-list">
+          <li><strong>Proxies</strong> — login-flow strategy (<code>anti409</code> for batch password combos, <code>legacy</code> for OTP / passwordless landing) and the proxy pool. Supports <code>host:port:user:pass</code>, full URL, and template <code>{SID}</code> for sticky sessions.</li>
+          <li><strong>Telegram</strong> — bot token from <code>@BotFather</code>, chat ID from <code>@userinfobot</code>. The “Send Telegram” toggle on UPI QR delivers the QR plus a spoiler-message containing <code>email|pass|secret</code>.</li>
+          <li><strong>Tunnel</strong> — one-click Cloudflare Quick Tunnel publishes the local UI at a random <code>*.trycloudflare.com</code> URL. Auto-downloads the <code>cloudflared</code> binary the first time. No Cloudflare account required.</li>
+        </ul>
+      </section>
+
+      <!-- ───── Troubleshoot ───── -->
+      <section class="help-section">
+        <h4>🩹 Troubleshooting cheat-sheet</h4>
+        <ul class="help-list">
+          <li><strong>Captcha / Turnstile keeps failing</strong> → switch to a residential proxy; datacenter IPs get banned aggressively (esp. India).</li>
+          <li><strong>UPI <code>confirm</code> rejected</strong> → Stripe needs 3 JS-runtime tokens. Use the bundled Rust UPI bot or keep retries high.</li>
+          <li><strong>Plus checkout shows the expensive price</strong> → your exit IP isn't JP/VN. See the “Get the cheap price” section above.</li>
+          <li><strong>Job stuck on “running”</strong> → check the Log card, the proxy pool status, and consider lowering Mode / concurrency.</li>
+          <li><strong>Web UI blank after refresh</strong> → make sure the URL still carries <code>?token=…</code>, or open it via the auto-injected link.</li>
+        </ul>
+      </section>
+
+      <!-- ───── Contact ───── -->
+      <section class="help-section help-section-cta">
+        <h4>💬 Need help, mail, or want to buy the full tool?</h4>
+        <p>Reach out on Telegram — fastest response is always a DM.</p>
+        <ul class="help-list">
+          <li>👤 <a href="https://t.me/prr9293" target="_blank" rel="noopener noreferrer"><strong>@prr9293</strong></a> — direct message for sales, custom builds, iCloud mail.</li>
+          <li>👥 <a href="https://t.me/+C6eafntO-Eo1Njdl" target="_blank" rel="noopener noreferrer">Telegram community group</a> — tips, updates, discussions.</li>
+          <li>💖 Donations welcome — Binance ID <code>356552242</code>, USDT BEP20 <code>0x137a3bfa30ee426127367773dfce16aefce04e02</code>, USDT TRC20 <code>TFy5d1EDT4WBKgtoypx7Ua2dCZhPHMSDNs</code>.</li>
+        </ul>
+      </section>
+
+    </div>
+
+    <footer class="modal-foot help-modal-foot">
+      <a class="btn btn-primary" href="https://t.me/prr9293" target="_blank" rel="noopener noreferrer">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 2 11 13"/><path d="M22 2 15 22l-4-9-9-4 20-7z"/></svg>
+        Contact @prr9293
+      </a>
+      <button class="btn btn-ghost" id="help-modal-done" type="button">Got it</button>
+    </footer>
+  </div>
+</div>
+
+<!-- Help modal controller (open/close, Esc, overlay click). Self-contained. -->
+<script>
+(function() {
+  'use strict';
+  var modal = document.getElementById('help-modal');
+  var btnOpen = document.getElementById('btn-help');
+  var btnClose = document.getElementById('help-modal-close');
+  var btnDone = document.getElementById('help-modal-done');
+  if (!modal || !btnOpen) return;
+
+  function open() {
+    modal.hidden = false;
+    document.body.classList.add('help-modal-locked');
+    // Focus close button for keyboard users
+    setTimeout(function() { if (btnClose) btnClose.focus(); }, 0);
+  }
+  function close() {
+    modal.hidden = true;
+    document.body.classList.remove('help-modal-locked');
+    if (btnOpen) btnOpen.focus();
+  }
+
+  btnOpen.addEventListener('click', open);
+  if (btnClose) btnClose.addEventListener('click', close);
+  if (btnDone) btnDone.addEventListener('click', close);
+
+  // Click on overlay backdrop (not on shell) → close
+  modal.addEventListener('click', function(ev) {
+    if (ev.target === modal) close();
+  });
+
+  // Esc closes
+  document.addEventListener('keydown', function(ev) {
+    if (ev.key === 'Escape' && !modal.hidden) close();
+  });
+})();
+</script>
+
+<!-- ════════════════ Help & Guide modal — opens via #btn-help in header ════════════════ -->
+<div class="modal help-modal" id="help-modal" hidden role="dialog" aria-modal="true" aria-labelledby="help-modal-title" tabindex="-1">
+  <div class="modal-content help-modal-content">
+    <header class="modal-head help-modal-head">
+      <h3 id="help-modal-title">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" width="16" height="16"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+        GSH Tool — Help &amp; Guide
+      </h3>
+      <button id="help-modal-close" class="modal-close-btn" type="button" aria-label="Close help">✕</button>
+    </header>
+
+    <div class="modal-body help-modal-body">
+
+      <section class="help-section">
+        <h4>👋 Welcome</h4>
+        <p>GSH is a <strong>batch ChatGPT signup &amp; payment automation tool</strong>. It runs locally on your machine and exposes a web UI to register accounts, fetch sessions, and pay UPI in bulk — with realtime progress for every job.</p>
+        <p class="help-tip">💡 <strong>Pricing tip:</strong> ChatGPT Plus is 40–60% cheaper in <strong>Vietnam (VN)</strong> and <strong>Japan (JP)</strong> due to PPP pricing. If you don't have a VN/JP login proxy, install a VN or JP VPN on the device running this tool to inherit the cheap region.</p>
+      </section>
+
+      <section class="help-section">
+        <h4>⚡ Quick Start (3 steps)</h4>
+        <ol class="help-list">
+          <li><strong>Pick a Mail Mode</strong> (top of <em>Reg</em> tab) — iCloud v3 is recommended. Don't have iCloud mails? <a href="https://t.me/prr9293" target="_blank" rel="noopener noreferrer">Contact @prr9293 on Telegram</a> to buy.</li>
+          <li><strong>Paste combos</strong> — one entry per line, following the placeholder format shown in the textarea.</li>
+          <li><strong>Pick Mode</strong> (top-right: Single / Multi 2/3/5/10/...) and press <strong>Run</strong>. Watch jobs stream in the Jobs panel.</li>
+        </ol>
+      </section>
+
+      <section class="help-section">
+        <h4>🗂️ Tab Guide</h4>
+        <dl class="help-dl">
+          <dt>Reg</dt><dd>Register fresh ChatGPT accounts in batch. Outputs <code>email|password|2fa_secret</code>.</dd>
+          <dt>Get Session</dt><dd>Take existing combos and extract usable session JSON (access_token + cookies) for downstream tools.</dd>
+          <dt>UPI QR</dt><dd>Run the ChatGPT Plus UPI checkout flow for India accounts and render a payable QR code. Optional Telegram delivery.</dd>
+          <dt>Settings</dt><dd>Configure proxy pool, Telegram bot, Cloudflare quick tunnel, and global flags (login flow, fingerprint).</dd>
+        </dl>
+      </section>
+
+      <section class="help-section">
+        <h4>📧 Mail Modes (Reg tab)</h4>
+        <dl class="help-dl">
+          <dt>iCloud v3 <span class="help-badge">recommended</span></dt><dd>Each line: <code>email|api_url</code> (Worker v2 readmail URL). Most reliable OTP delivery. Contact <a href="https://t.me/prr9293" target="_blank" rel="noopener noreferrer">@prr9293</a> to buy iCloud mails.</dd>
+          <dt>Outlook</dt><dd>Format <code>email|password|refresh_token|client_id</code>. Useful if you have an Outlook pool already.</dd>
+          <dt>iCloud Worker</dt><dd>Plain iCloud emails, one per line — OTP fetched via shared Worker. Need iCloud mails? <a href="https://t.me/prr9293" target="_blank" rel="noopener noreferrer">@prr9293</a>.</dd>
+          <dt>Gmail (advanced)</dt><dd>Pre-checked Gmail addresses via custom OTP API. Each line: <code>api_url</code> or <code>email|api_url</code>.</dd>
+        </dl>
+      </section>
+
+      <section class="help-section">
+        <h4>🌐 Reg Modes</h4>
+        <dl class="help-dl">
+          <dt>Browser (anti-detect)</dt><dd>Full Camoufox (Firefox-shaped) flow. Highest stealth, slowest. Best for difficult IPs.</dd>
+          <dt>Hybrid <span class="help-badge">default</span></dt><dd>Pure-Python HTTP + Camoufox sentinel sidecar for token minting. Much faster than Browser, similar success rate on clean proxies.</dd>
+        </dl>
+        <p class="help-tip">💡 Use <strong>Headless</strong> toggle to hide browser windows. Enable <strong>Debug</strong> to keep them open when headed (for inspection).</p>
+      </section>
+
+      <section class="help-section">
+        <h4>🔌 Settings → Proxies</h4>
+        <p>Paste one proxy per line. Three accepted formats:</p>
+        <ul class="help-list-compact">
+          <li><code>host:port:user:pass</code></li>
+          <li><code>http://user:pass@host:port</code></li>
+          <li><code>socks5://user:pass@host:port</code></li>
+        </ul>
+        <p><strong>Login flow</strong>: <code>anti409</code> = best for batch password combos (warm + sentinel verify, avoids HTTP 409). <code>legacy</code> = use for passwordless/OTP accounts when landing page is ambiguous.</p>
+      </section>
+
+      <section class="help-section">
+        <h4>📱 Settings → Telegram</h4>
+        <p>Bot token from <code>@BotFather</code>, chat ID from <code>@userinfobot</code>. When the <strong>Send Telegram</strong> toggle is on in the UPI QR tab, every successful job ships the QR image + expiry time + a spoiler reply containing <code>email|pass|secret</code>.</p>
+      </section>
+
+      <section class="help-section">
+        <h4>🚇 Settings → Cloudflare Quick Tunnel</h4>
+        <p>One click to expose your local UI as <code>https://*.trycloudflare.com</code>. No Cloudflare account required — a random URL is issued each time. The tool downloads the <code>cloudflared</code> binary automatically on first use (Win / Mac / Linux, x64 / arm64).</p>
+      </section>
+
+      <section class="help-section">
+        <h4>💰 UPI QR — How it Works</h4>
+        <ol class="help-list">
+          <li>Paste combos: <code>email|password|totp_secret</code> (India accounts).</li>
+          <li>Tool logs in, creates a ChatGPT Plus checkout, initializes Stripe, fetches elements, confirms with your UPI VPA, then polls approve until you scan the QR with PhonePe / GPay / Paytm / BHIM.</li>
+          <li>Tune <strong>Approve retries</strong>, <strong>Restart threshold</strong> and <strong>Re-login cycles</strong> when an IP/edge keeps rejecting — see each field's tooltip for guidance.</li>
+        </ol>
+        <p class="help-tip">⚠️ India region needs <strong>residential proxies</strong> for production — datacenter IPs get blocked by Turnstile aggressively.</p>
+      </section>
+
+      <section class="help-section">
+        <h4>🛟 Troubleshooting</h4>
+        <dl class="help-dl">
+          <dt>Captcha / Turnstile keeps failing</dt><dd>Switch to a residential proxy (especially for India). Datacenter IPs are rate-limited and burned quickly.</dd>
+          <dt>HTTP 409 invalid_state on password verify</dt><dd>Switch <strong>Login flow</strong> to <code>anti409</code> in Settings → Proxies.</dd>
+          <dt>UPI confirm returns blocked / 403 / 429</dt><dd>Increase <strong>Re-login cycles</strong> (try 2–3) and set <strong>Block-streak</strong> to break the cycle quickly. Rotate to fresh IPs.</dd>
+          <dt>OTP never arrives</dt><dd>Verify the mail mode credentials. For iCloud v3, the api_url must be a valid Worker v2 readmail URL.</dd>
+          <dt>UI shows blank / 401</dt><dd>URL must include <code>?token=&lt;your_token&gt;</code>, or set <code>X-API-Token</code> header. Token is in <code>.env</code> as <code>GPT_SIGNUP_WEB_TOKEN</code>.</dd>
+        </dl>
+      </section>
+
+      <section class="help-section help-section-contact">
+        <h4>💬 Need Help, Mails, or the Tool?</h4>
+        <p>For iCloud mail purchases, custom tool support, integration help, or anything else — reach out on Telegram:</p>
+        <ul class="help-list-compact">
+          <li><strong>DM:</strong> <a href="https://t.me/prr9293" target="_blank" rel="noopener noreferrer">@prr9293</a></li>
+          <li><strong>Community group:</strong> <a href="https://t.me/+C6eafntO-Eo1Njdl" target="_blank" rel="noopener noreferrer">t.me/+C6eafntO-Eo1Njdl</a></li>
+        </ul>
+      </section>
+
+    </div>
+
+    <footer class="modal-foot help-modal-foot">
+      <a href="https://t.me/prr9293" target="_blank" rel="noopener noreferrer" class="btn btn-primary">💬 Contact @prr9293</a>
+      <button id="help-modal-done" class="btn btn-ghost" type="button">Close</button>
+    </footer>
+  </div>
+</div>
+
+<script>
+// Help modal toggle — self-contained, no dependency on app.js
+(function() {
+  'use strict';
+  const modal = document.getElementById('help-modal');
+  const openBtn = document.getElementById('btn-help');
+  const closeBtn = document.getElementById('help-modal-close');
+  const doneBtn = document.getElementById('help-modal-done');
+  if (!modal || !openBtn) return;
+
+  let lastFocus = null;
+
+  function open() {
+    lastFocus = document.activeElement;
+    modal.hidden = false;
+    document.body.classList.add('help-modal-open');
+    // Defer focus so screen readers pick it up after render
+    requestAnimationFrame(() => {
+      if (closeBtn) closeBtn.focus();
+    });
+  }
+
+  function close() {
+    modal.hidden = true;
+    document.body.classList.remove('help-modal-open');
+    if (lastFocus && typeof lastFocus.focus === 'function') {
+      lastFocus.focus();
+    }
+  }
+
+  openBtn.addEventListener('click', open);
+  if (closeBtn) closeBtn.addEventListener('click', close);
+  if (doneBtn) doneBtn.addEventListener('click', close);
+
+  // Click on overlay (not on shell) closes
+  modal.addEventListener('click', (e) => {
+    if (e.target === modal) close();
+  });
+
+  // Esc closes when modal is open
+  document.addEventListener('keydown', (e) => {
+    if (!modal.hidden && (e.key === 'Escape' || e.key === 'Esc')) {
+      e.preventDefault();
+      close();
+    }
+  });
+})();
+</script>
+
+<!-- ════════════════ Floating Telegram contact — always visible across all tabs ════════════════ -->
+<a class="telegram-fab" href="https://t.me/prr9293" target="_blank" rel="noopener noreferrer"
+   aria-label="Contact @prr9293 on Telegram"
+   title="💬 Contact @prr9293 on Telegram — buy iCloud mail / support / tool">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 2 11 13"/><path d="M22 2 15 22l-4-9-9-4 20-7z"/></svg>
+  <span class="telegram-fab-label">@prr9293</span>
+</a>
+</body>
+</html>

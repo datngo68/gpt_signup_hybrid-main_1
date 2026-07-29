@@ -1,0 +1,18 @@
+{
+  "success": false,
+  "email": "temper-17-harvest+jnpeb0x@icloud.com",
+  "password": null,
+  "name": null,
+  "age": null,
+  "user_id": null,
+  "account_id": null,
+  "session_token": null,
+  "access_token": null,
+  "cookies": [],
+  "phase1_seconds": 0.0,
+  "phase2_seconds": 0.0,
+  "otp_seconds": 0.0,
+  "error": "RequestPhaseError: email temper-17-harvest+jnpeb0x@icloud.com đã được đăng ký (invalid_auth_step) — cần email mới để reg",
+  "two_factor": null,
+  "two_factor_partial": null
+}

@@ -1,0 +1,267 @@
+{
+  "pbtResults": {
+    "1. Viết test reproduce drift hybrid vs golden (TRƯỚC khi fix)": {
+      "status": "passed",
+      "failingExample": "Exploration test FAIL trên code CHƯA fix (đúng kỳ vọng — xác nhận drift). 4/4 case surface counterexample:\n- A1 double-POST: createAccountPostCount(hybrid)=2 > 1 (golden=1) — _create_account_with_retry POST /api/accounts/create_account lần 2 khi parse lần 1 raise ValueError.\n- A2 step diff happy path: stepSequence(hybrid) có EXTRA step 'https://chatgpt.com/' (GET promo landing qua _visit_promo_landing Phase 0) mà golden ChatGPTRelay.run() KHÔNG có. extra=['https://chatgpt.com/'], missing=∅.\n- B1 synthetic feeder: browser_pool._acquire_context_in_thread inject _OBSERVER_FEEDER_JS + _mint_so_in_thread inject _OBSERVER_BURST_JS → `so` token sinh từ synthetic DOM events.\n- B2 shared browser: pool launch browser 1 lần, tái dùng cùng instance cho 2 acquire khác signup (same_runner + same_browser_instance) → cluster fingerprint.",
+      "lastRunTimestamp": 1782523580819
+    },
+    "3. Viết preservation property test baseline (TRƯỚC khi fix)": {
+      "status": "passed",
+      "lastRunTimestamp": 1782524503627
+    },
+    "4.4 Verify drift test (task 1) — phần nhánh A giờ PASS": {
+      "status": "passed",
+      "lastRunTimestamp": 1782525453196
+    },
+    "6.2 Verify Property 2 — preservation test vẫn PASS": {
+      "status": "passed",
+      "lastRunTimestamp": 1782525618519
+    }
+  },
+  "executionHistory": {
+    "1. Viết test reproduce drift hybrid vs golden (TRƯỚC khi fix)": [
+      {
+        "executionId": "e385a0f9-1bc3-43a6-aa71-6c99e946bcc3",
+        "chatSessionId": "sess_9ee4c3f5-47b7-4a14-9b93-7b201221b271",
+        "timestamp": 1782522957487
+      },
+      {
+        "executionId": "e385a0f9-1bc3-43a6-aa71-6c99e946bcc3",
+        "chatSessionId": "sess_9ee4c3f5-47b7-4a14-9b93-7b201221b271",
+        "timestamp": 1782522972418
+      },
+      {
+        "executionId": "e385a0f9-1bc3-43a6-aa71-6c99e946bcc3",
+        "chatSessionId": "sess_9ee4c3f5-47b7-4a14-9b93-7b201221b271",
+        "timestamp": 1782523635092
+      }
+    ],
+    "2. Bước phân loại root cause (BẮT BUỘC — gate cho nhánh B)": [
+      {
+        "executionId": "e385a0f9-1bc3-43a6-aa71-6c99e946bcc3",
+        "chatSessionId": "sess_9ee4c3f5-47b7-4a14-9b93-7b201221b271",
+        "timestamp": 1782522957542
+      },
+      {
+        "executionId": "e385a0f9-1bc3-43a6-aa71-6c99e946bcc3",
+        "chatSessionId": "sess_9ee4c3f5-47b7-4a14-9b93-7b201221b271",
+        "timestamp": 1782523659403
+      },
+      {
+        "executionId": "e385a0f9-1bc3-43a6-aa71-6c99e946bcc3",
+        "chatSessionId": "sess_9ee4c3f5-47b7-4a14-9b93-7b201221b271",
+        "timestamp": 1782523998667
+      }
+    ],
+    "3. Viết preservation property test baseline (TRƯỚC khi fix)": [
+      {
+        "executionId": "e385a0f9-1bc3-43a6-aa71-6c99e946bcc3",
+        "chatSessionId": "sess_9ee4c3f5-47b7-4a14-9b93-7b201221b271",
+        "timestamp": 1782522958129
+      },
+      {
+        "executionId": "e385a0f9-1bc3-43a6-aa71-6c99e946bcc3",
+        "chatSessionId": "sess_9ee4c3f5-47b7-4a14-9b93-7b201221b271",
+        "timestamp": 1782524005965
+      },
+      {
+        "executionId": "e385a0f9-1bc3-43a6-aa71-6c99e946bcc3",
+        "chatSessionId": "sess_9ee4c3f5-47b7-4a14-9b93-7b201221b271",
+        "timestamp": 1782524542553
+      }
+    ],
+    "4.1 Bỏ `_create_account_with_retry` double-POST": [
+      {
+        "executionId": "e385a0f9-1bc3-43a6-aa71-6c99e946bcc3",
+        "chatSessionId": "sess_9ee4c3f5-47b7-4a14-9b93-7b201221b271",
+        "timestamp": 1782522958731
+      },
+      {
+        "executionId": "e385a0f9-1bc3-43a6-aa71-6c99e946bcc3",
+        "chatSessionId": "sess_9ee4c3f5-47b7-4a14-9b93-7b201221b271",
+        "timestamp": 1782524596678
+      },
+      {
+        "executionId": "e385a0f9-1bc3-43a6-aa71-6c99e946bcc3",
+        "chatSessionId": "sess_9ee4c3f5-47b7-4a14-9b93-7b201221b271",
+        "timestamp": 1782524769224
+      }
+    ],
+    "4.2 Thu hẹp delta `run()` về đúng OTP loop": [
+      {
+        "executionId": "e385a0f9-1bc3-43a6-aa71-6c99e946bcc3",
+        "chatSessionId": "sess_9ee4c3f5-47b7-4a14-9b93-7b201221b271",
+        "timestamp": 1782522958785
+      },
+      {
+        "executionId": "e385a0f9-1bc3-43a6-aa71-6c99e946bcc3",
+        "chatSessionId": "sess_9ee4c3f5-47b7-4a14-9b93-7b201221b271",
+        "timestamp": 1782524777353
+      },
+      {
+        "executionId": "e385a0f9-1bc3-43a6-aa71-6c99e946bcc3",
+        "chatSessionId": "sess_9ee4c3f5-47b7-4a14-9b93-7b201221b271",
+        "timestamp": 1782525008617
+      }
+    ],
+    "4.3 Test guard chống drift tương lai": [
+      {
+        "executionId": "e385a0f9-1bc3-43a6-aa71-6c99e946bcc3",
+        "chatSessionId": "sess_9ee4c3f5-47b7-4a14-9b93-7b201221b271",
+        "timestamp": 1782522958841
+      },
+      {
+        "executionId": "e385a0f9-1bc3-43a6-aa71-6c99e946bcc3",
+        "chatSessionId": "sess_9ee4c3f5-47b7-4a14-9b93-7b201221b271",
+        "timestamp": 1782525013928
+      },
+      {
+        "executionId": "e385a0f9-1bc3-43a6-aa71-6c99e946bcc3",
+        "chatSessionId": "sess_9ee4c3f5-47b7-4a14-9b93-7b201221b271",
+        "timestamp": 1782525236928
+      }
+    ],
+    "4.4 Verify drift test (task 1) — phần nhánh A giờ PASS": [
+      {
+        "executionId": "e385a0f9-1bc3-43a6-aa71-6c99e946bcc3",
+        "chatSessionId": "sess_9ee4c3f5-47b7-4a14-9b93-7b201221b271",
+        "timestamp": 1782522958877
+      },
+      {
+        "executionId": "e385a0f9-1bc3-43a6-aa71-6c99e946bcc3",
+        "chatSessionId": "sess_9ee4c3f5-47b7-4a14-9b93-7b201221b271",
+        "timestamp": 1782525242800
+      },
+      {
+        "executionId": "e385a0f9-1bc3-43a6-aa71-6c99e946bcc3",
+        "chatSessionId": "sess_9ee4c3f5-47b7-4a14-9b93-7b201221b271",
+        "timestamp": 1782525509163
+      }
+    ],
+    "5.1 Loại synthetic Observer feeder (ứng viên #1)": [
+      {
+        "executionId": "e385a0f9-1bc3-43a6-aa71-6c99e946bcc3",
+        "chatSessionId": "sess_9ee4c3f5-47b7-4a14-9b93-7b201221b271",
+        "timestamp": 1782522958913
+      },
+      {
+        "executionId": "c44647af-975c-44ce-a481-9306e37ab97c",
+        "chatSessionId": "sess_9ee4c3f5-47b7-4a14-9b93-7b201221b271",
+        "timestamp": 1782555082947
+      },
+      {
+        "executionId": "c44647af-975c-44ce-a481-9306e37ab97c",
+        "chatSessionId": "sess_9ee4c3f5-47b7-4a14-9b93-7b201221b271",
+        "timestamp": 1782556904469
+      }
+    ],
+    "5.2 Cân nhắc bỏ shared-browser pool (ứng viên #2)": [
+      {
+        "executionId": "e385a0f9-1bc3-43a6-aa71-6c99e946bcc3",
+        "chatSessionId": "sess_9ee4c3f5-47b7-4a14-9b93-7b201221b271",
+        "timestamp": 1782522958945
+      },
+      {
+        "executionId": "e385a0f9-1bc3-43a6-aa71-6c99e946bcc3",
+        "chatSessionId": "sess_9ee4c3f5-47b7-4a14-9b93-7b201221b271",
+        "timestamp": 1782529586029
+      },
+      {
+        "executionId": "e385a0f9-1bc3-43a6-aa71-6c99e946bcc3",
+        "chatSessionId": "sess_9ee4c3f5-47b7-4a14-9b93-7b201221b271",
+        "timestamp": 1782530639161
+      },
+      {
+        "executionId": "c44647af-975c-44ce-a481-9306e37ab97c",
+        "chatSessionId": "sess_9ee4c3f5-47b7-4a14-9b93-7b201221b271",
+        "timestamp": 1782556937869
+      }
+    ],
+    "5.3 Giữ nguyên các khía cạnh đã khớp golden": [
+      {
+        "executionId": "e385a0f9-1bc3-43a6-aa71-6c99e946bcc3",
+        "chatSessionId": "sess_9ee4c3f5-47b7-4a14-9b93-7b201221b271",
+        "timestamp": 1782522958977
+      },
+      {
+        "executionId": "c44647af-975c-44ce-a481-9306e37ab97c",
+        "chatSessionId": "sess_9ee4c3f5-47b7-4a14-9b93-7b201221b271",
+        "timestamp": 1782556944469
+      }
+    ],
+    "5.4 Verify drift test (task 1) — phần nhánh B giờ PASS": [
+      {
+        "executionId": "e385a0f9-1bc3-43a6-aa71-6c99e946bcc3",
+        "chatSessionId": "sess_9ee4c3f5-47b7-4a14-9b93-7b201221b271",
+        "timestamp": 1782522959009
+      },
+      {
+        "executionId": "c44647af-975c-44ce-a481-9306e37ab97c",
+        "chatSessionId": "sess_9ee4c3f5-47b7-4a14-9b93-7b201221b271",
+        "timestamp": 1782556952458
+      }
+    ],
+    "6.1 Verify Property 1 — toàn bộ drift test PASS": [
+      {
+        "executionId": "e385a0f9-1bc3-43a6-aa71-6c99e946bcc3",
+        "chatSessionId": "sess_9ee4c3f5-47b7-4a14-9b93-7b201221b271",
+        "timestamp": 1782522959069
+      },
+      {
+        "executionId": "c44647af-975c-44ce-a481-9306e37ab97c",
+        "chatSessionId": "sess_9ee4c3f5-47b7-4a14-9b93-7b201221b271",
+        "timestamp": 1782556964607
+      }
+    ],
+    "6.2 Verify Property 2 — preservation test vẫn PASS": [
+      {
+        "executionId": "e385a0f9-1bc3-43a6-aa71-6c99e946bcc3",
+        "chatSessionId": "sess_9ee4c3f5-47b7-4a14-9b93-7b201221b271",
+        "timestamp": 1782522959142
+      },
+      {
+        "executionId": "e385a0f9-1bc3-43a6-aa71-6c99e946bcc3",
+        "chatSessionId": "sess_9ee4c3f5-47b7-4a14-9b93-7b201221b271",
+        "timestamp": 1782525550512
+      },
+      {
+        "executionId": "e385a0f9-1bc3-43a6-aa71-6c99e946bcc3",
+        "chatSessionId": "sess_9ee4c3f5-47b7-4a14-9b93-7b201221b271",
+        "timestamp": 1782525643891
+      }
+    ],
+    "7. Checkpoint - Đảm bảo toàn bộ test pass": [
+      {
+        "executionId": "e385a0f9-1bc3-43a6-aa71-6c99e946bcc3",
+        "chatSessionId": "sess_9ee4c3f5-47b7-4a14-9b93-7b201221b271",
+        "timestamp": 1782522959176
+      },
+      {
+        "executionId": "c44647af-975c-44ce-a481-9306e37ab97c",
+        "chatSessionId": "sess_9ee4c3f5-47b7-4a14-9b93-7b201221b271",
+        "timestamp": 1782556972321
+      }
+    ],
+    "4. Fix nhánh A — `reg_hybrid/relay.py` (VÔ ĐIỀU KIỆN)": [
+      {
+        "executionId": "e385a0f9-1bc3-43a6-aa71-6c99e946bcc3",
+        "chatSessionId": "sess_9ee4c3f5-47b7-4a14-9b93-7b201221b271",
+        "timestamp": 1782525509225
+      }
+    ],
+    "5. Fix nhánh B — oracle/token layer (CÓ ĐIỀU KIỆN — GATED bởi task 2)": [
+      {
+        "executionId": "c44647af-975c-44ce-a481-9306e37ab97c",
+        "chatSessionId": "sess_9ee4c3f5-47b7-4a14-9b93-7b201221b271",
+        "timestamp": 1782556952501
+      }
+    ],
+    "6. Verify Property 1 + Property 2": [
+      {
+        "executionId": "c44647af-975c-44ce-a481-9306e37ab97c",
+        "chatSessionId": "sess_9ee4c3f5-47b7-4a14-9b93-7b201221b271",
+        "timestamp": 1782556964654
+      }
+    ]
+  }
+}

@@ -1,0 +1,22 @@
+rules:
+  - capability: "*"
+    match: ["*"]
+    effect: allow
+  - capability: shell
+    match: ["*"]
+    effect: allow
+  - capability: fs_read
+    match: ["*"]
+    effect: allow
+  - capability: fs_write
+    match: ["*"]
+    effect: allow
+  - capability: web_fetch
+    match: ["*"]
+    effect: allow
+  - capability: web_search
+    match: ["*"]
+    effect: allow
+  - capability: mcp
+    match: ["*"]
+    effect: allow

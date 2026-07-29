@@ -1,0 +1,18 @@
+{
+  "success": false,
+  "email": "sierra.seabed0y+dc3cmez@icloud.com",
+  "password": null,
+  "name": null,
+  "age": null,
+  "user_id": null,
+  "account_id": null,
+  "session_token": null,
+  "access_token": null,
+  "cookies": [],
+  "phase1_seconds": 0.0,
+  "phase2_seconds": 0.0,
+  "otp_seconds": 0.0,
+  "error": "Timeout: Failed to perform, curl: (28) Connection timed out after 30002 milliseconds. See https://curl.se/libcurl/c/libcurl-errors.html first for more details.",
+  "two_factor": null,
+  "two_factor_partial": null
+}

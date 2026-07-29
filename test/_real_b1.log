@@ -1,0 +1,43 @@
+EMAIL=harried.13-escape+3sok6n@icloud.com MODE=browser OUT=test/_real_b1.log RESULT=test/_real_browser_145524.json
+STARTED_AT=2026-06-26T14:55:24+07:00
+===
+[14:55:24] [signup] profile: name=Real Test age=30 locale=default
+[14:55:24] [signup] phase 1: browser → email-verification → submit OTP → /about-you (email=harried.13-escape+3sok6n@icloud.com)
+[14:55:24] [browser] device_id=79dd6295-cd0e-4c37-9b58-c70e0512e458
+[14:55:24] [browser] locale=default en-US (no proxy)
+[14:55:24] [browser] navigator.languages=['en-US', 'en']
+[14:55:39] [browser] chatgpt.com loaded
+[14:55:40] [fingerprint] OK webgl='Google Inc. (NVIDIA)'/'ANGLE (NVIDIA, NVIDIA GeForce GTX 980 Direct3D11 v' canvas=1198B audio=on@48000Hz plugins=5 hc=8 webdriver=off
+[14:55:40] [browser] auth_session_logging_id=fce9eb7b-28af-4704-917e-0e5210083259 (gen — cookie missing)
+[14:55:40] [browser] bootstrapping NextAuth (csrf + signin)...
+[14:55:41] [browser] authorize URL ready: https://auth.openai.com/api/accounts/authorize?client_id=app_X8zY6vW2pQ9tR3dE7nK1jL5gH&scope=openid%20email%20profile%20...
+[14:55:50] [flow] screen=continue url=https://auth.openai.com/email-verification
+[14:55:51] [flow] clicked password button: Continue with password
+[14:55:54] [flow] screen=password_create url=https://auth.openai.com/create-account/password
+[14:55:54] [flow] password input detected: input[type="password"]
+[14:55:54] [browser] sentinel cookie oai-sc ready
+[14:55:55] [flow] human-type password (delay 120-260ms Gaussian)
+[14:56:00] [flow] submit form → expect /api/accounts/user/register response
+[14:56:16] [flow] clicked submit: button[type="submit"]
+[14:56:18] [flow] register OK (HTTP 200) — page tự navigate qua redirect
+[14:56:20] [flow] screen=otp url=https://auth.openai.com/email-verification
+[14:56:20] [browser] OTP input ready (input[name="code"])
+[14:56:21] [flow] polling OTP (recipient=harried.13-escape+3sok6n@icloud.com) since 2026-06-26T07:56:21+00:00
+[14:56:21] [otp:worker] polling harried.13-escape+3sok6n@icloud.com (timeout 90s)
+[14:56:22] [otp:worker] found 666658 (attempt 1)
+[14:56:25] [flow] OTP=666658 got in 3.9s
+[14:56:25] [browser] typing OTP 666658 (page=open ctx_pages_live=1/1 browser=n/a)
+[14:56:28] [browser] OTP submitted via Enter
+[14:56:29] [browser] OTP validate UI → HTTP 401
+[14:56:31] [flow] OTP rejected: Incorrect code — resend email & poll lại
+[14:56:32] [flow] clicked 'Resend email'
+[14:56:34] [browser] OTP input ready (input[name="code"])
+[14:56:35] [flow] polling OTP (recipient=harried.13-escape+3sok6n@icloud.com) since 2026-06-26T07:56:35+00:00
+[14:56:35] [otp:worker] polling harried.13-escape+3sok6n@icloud.com (timeout 90s)
+[14:56:35] [otp:worker] found 798148 (attempt 1)
+[14:56:39] [flow] OTP=798148 got in 3.8s
+[14:56:39] [browser] typing OTP 798148 (page=open ctx_pages_live=1/1 browser=n/a)
+[14:56:42] [browser] OTP submitted via Enter
+[14:56:43] [browser] OTP validate UI → HTTP 200
+[14:56:43] [flow] OTP OK → follow continue_url https://auth.openai.com/about-you
+[14:56:43] [flow] goto continue_url aborted (page đã nav song song) — OK, để state machine detect

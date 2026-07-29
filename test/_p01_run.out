@@ -1,0 +1,42 @@
+[1/4] AST parse browser_phase.py...
+      ✓ syntax OK
+      ✓ _submit_otp_via_api return annotation = str | None
+      ✓ _submit_otp return annotation = tuple[str | None, str]
+      ✓ _submit_otp dùng expect_response + human_type + Enter
+      ✓ goto(otp_continue_url) xuất hiện 3 lần (conditional on source=='api')
+      ✓ goto gated bằng otp_source == 'api' (UI path không race)
+      ✓ API fallback (P0) vẫn goto continue_url
+[2/4] Case A: 200 + body có continue_url → return URL
+      log: [browser] OTP fallback API → HTTP 200 body={"continue_url": "https://auth.openai.com/about-you", "method": "GET", "page": {"type": "about_you"}}
+      ✓ continue_url='https://auth.openai.com/about-you'
+[3/4] Case B: 200 + body JSON thiếu continue_url → None
+      log: [browser] OTP fallback API → HTTP 200 body={"method":"GET"}
+      log: [browser] OTP fallback API: response thiếu continue_url field
+      ✓ None
+      Case C: 200 + body không phải JSON → None
+      log: [browser] OTP fallback API → HTTP 200 body=<html>error</html>
+      log: [browser] OTP fallback API: body không phải JSON, không có continue_url
+      ✓ None
+      Case D: 200 + body rỗng → None
+      log: [browser] OTP fallback API → HTTP 200 body=
+      log: [browser] OTP fallback API: empty body, không có continue_url
+      ✓ None
+      Case E: 200 + body là array (không phải object) → None
+      log: [browser] OTP fallback API → HTTP 200 body=[]
+      log: [browser] OTP fallback API: body không phải object (got list)
+      ✓ None
+      Case F: 200 + continue_url chỉ chứa whitespace → None
+      log: [browser] OTP fallback API → HTTP 200 body={"continue_url": "   "}
+      log: [browser] OTP fallback API: response thiếu continue_url field
+      ✓ None
+[4/4] Error cases
+      Case G: HTTP 400 → raise BrowserPhaseError
+      log: [browser] OTP fallback API → HTTP 400 body={"error":"bad"}
+      ✓ raised: OTP validate API rejected: HTTP 400: {"error":"bad"}
+      Case H: HTTP 500 → raise BrowserPhaseError
+      log: [browser] OTP fallback API → HTTP 500 body=internal
+      ✓ raised: OTP validate API rejected: HTTP 500: internal
+      Case I: ctx.request = None → raise BrowserPhaseError
+      ✓ raised: OTP fallback failed: context.request không khả dụng (Camoufox/Playwright version cũ?)
+
+All checks passed.

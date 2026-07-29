@@ -1,0 +1,78 @@
+EMAIL=forbear.atelier8l+jl4pw1@icloud.com MODE=browser OUT=test/_real_b2.log RESULT=test/_real_browser_150256.json
+STARTED_AT=2026-06-26T15:02:56+07:00
+===
+[15:02:56] [signup] profile: name=Real Test age=26 locale=default
+[15:02:56] [signup] phase 1: browser → email-verification → submit OTP → /about-you (email=forbear.atelier8l+jl4pw1@icloud.com)
+[15:02:56] [browser] device_id=c9ef0735-2a43-428d-ac5c-bb39bbc1736c
+[15:02:56] [browser] locale=default en-US (no proxy)
+[15:02:56] [browser] navigator.languages=['en-US', 'en']
+[15:03:02] [browser] chatgpt.com loaded
+[15:03:02] [fingerprint] OK webgl='Google Inc. (Intel)'/'ANGLE (Intel, Intel(R) HD Graphics 400 Direct3D11 ' canvas=1202B audio=on@48000Hz plugins=5 hc=8 webdriver=off
+[15:03:02] [browser] auth_session_logging_id=0d55b04c-6620-4b50-8de4-fc9c375bf535 (gen — cookie missing)
+[15:03:02] [browser] bootstrapping NextAuth (csrf + signin)...
+[15:03:04] [browser] authorize URL ready: https://auth.openai.com/api/accounts/authorize?client_id=app_X8zY6vW2pQ9tR3dE7nK1jL5gH&scope=openid%20email%20profile%20...
+[15:03:08] [flow] screen=continue url=https://auth.openai.com/email-verification
+[15:03:09] [flow] clicked password button: Continue with password
+[15:03:10] [flow] screen=password_create url=https://auth.openai.com/create-account/password
+[15:03:10] [flow] password input detected: input[type="password"]
+[15:03:10] [browser] sentinel cookie oai-sc ready
+[15:03:11] [flow] human-type password (delay 120-260ms Gaussian)
+[15:03:17] [flow] submit form → expect /api/accounts/user/register response
+[15:03:30] [flow] clicked submit: button[type="submit"]
+[15:03:31] [flow] register OK (HTTP 200) — page tự navigate qua redirect
+[15:03:34] [flow] screen=otp url=https://auth.openai.com/email-verification
+[15:03:34] [browser] OTP input ready (input[name="code"])
+[15:03:35] [flow] polling OTP (recipient=forbear.atelier8l+jl4pw1@icloud.com) since 2026-06-26T08:03:35+00:00
+[15:03:35] [otp:worker] polling forbear.atelier8l+jl4pw1@icloud.com (timeout 90s)
+[15:03:35] [otp:worker] found 178887 (attempt 1)
+[15:03:39] [flow] OTP=178887 got in 3.7s
+[15:03:39] [browser] typing OTP 178887 (page=open ctx_pages_live=1/1 browser=n/a)
+[15:03:42] [browser] OTP submitted via Enter
+[15:03:42] [browser] OTP validate UI → HTTP 401
+[15:03:45] [flow] OTP rejected: Incorrect code — resend email & poll lại
+[15:03:47] [flow] clicked 'Resend email'
+[15:03:49] [browser] OTP input ready (input[name="code"])
+[15:03:50] [flow] polling OTP (recipient=forbear.atelier8l+jl4pw1@icloud.com) since 2026-06-26T08:03:50+00:00
+[15:03:50] [otp:worker] polling forbear.atelier8l+jl4pw1@icloud.com (timeout 90s)
+[15:03:50] [otp:worker] found 341535 (attempt 1)
+[15:03:54] [flow] OTP=341535 got in 4.1s
+[15:03:54] [browser] typing OTP 341535 (page=open ctx_pages_live=1/1 browser=n/a)
+[15:03:57] [browser] OTP submitted via Enter
+[15:03:58] [browser] OTP validate UI → HTTP 200
+[15:03:58] [flow] OTP OK (UI form path) — page tự nav tới https://auth.openai.com/about-you, KHÔNG goto manual
+[15:04:00] [flow] screen=about_you url=https://auth.openai.com/about-you
+[15:04:00] [browser] sentinel cookie oai-sc ready
+[15:04:00] [browser] /about-you: fill name='Real Test'
+[15:04:07] [browser] human-typed age=26
+[15:04:42] [browser] clicked button[type="submit"]
+[15:04:52] [browser] callback response OK: HTTP 302 set-cookie-has-session=True
+[15:04:53] [browser] callback URL captured (HTTP 302)
+[15:04:53] [browser] chatgpt session ready (14 cookies, _account=True)
+[15:04:54] [browser] handoff: 36 cookies, state=lwgwPxATMgKWllBHLbMT...
+[15:04:54] [signup] phase 1 done in 117.80s (OTP 7.80s)
+[15:04:54] [signup] phase 2: HTTP extract session + access_token
+[15:04:54] [http] session-token from handoff (4059 bytes)
+[15:04:55] [signup] phase 2 done in 0.44s
+[15:04:55] [signup] total 118.24s
+[db] session result + combo persisted atomically for forbear.atelier8l+jl4pw1@icloud.com
+{
+  "success": true,
+  "email": "forbear.atelier8l+jl4pw1@icloud.com",
+  "password": "Ycf95cfc8r3@",
+  "name": "Real Test",
+  "age": 26,
+  "user_id": "user-hCiCXFkKIBAp9rI9yKFbte3k",
+  "account_id": "34ef10f1-c27f-4b1b-9839-3781c1d71023",
+  "phase1_seconds": 117.79915791691747,
+  "phase2_seconds": 0.4441968339961022,
+  "otp_seconds": 7.803744541946799,
+  "error": null,
+  "two_factor": null,
+  "two_factor_partial": null,
+  "session_token_len": 4059,
+  "access_token_len": 2016,
+  "cookies_count": 14,
+  "output": "/Users/vippro/Developments/gpt_signup_hybrid/test/_real_browser_150256.json"
+}
+===
+ENDED_AT=2026-06-26T15:04:55+07:00 EXIT=0

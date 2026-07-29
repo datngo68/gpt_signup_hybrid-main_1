@@ -1,0 +1,37 @@
+EMAIL=legato-grunts.4g+f5ij1@icloud.com MODE=browser OUT=test/_real_acc5_browser.log RESULT=test/_real_browser_143824.json
+STARTED_AT=2026-06-26T14:38:24+07:00
+===
+[14:38:25] [signup] profile: name=Real Test age=28 locale=default
+[14:38:25] [signup] phase 1: browser → email-verification → submit OTP → /about-you (email=legato-grunts.4g+f5ij1@icloud.com)
+[14:38:25] [browser] device_id=3626d68f-a09f-4ec8-8ed8-a4c0e370e264
+[14:38:25] [browser] locale=default en-US (no proxy)
+[14:38:25] [browser] navigator.languages=['en-US', 'en']
+[14:38:30] [browser] chatgpt.com loaded
+[14:38:30] [fingerprint] OK webgl='Google Inc. (AMD)'/'ANGLE (AMD, Radeon HD 3200 Graphics Direct3D11 vs_' canvas=1198B audio=on@48000Hz plugins=5 hc=12 webdriver=off
+[14:38:31] [browser] auth_session_logging_id=62f937b3-9877-4659-a933-6cee70b4722c (gen — cookie missing)
+[14:38:31] [browser] bootstrapping NextAuth (csrf + signin)...
+[14:38:31] [browser] authorize URL ready: https://auth.openai.com/api/accounts/authorize?client_id=app_X8zY6vW2pQ9tR3dE7nK1jL5gH&scope=openid%20email%20profile%20...
+[14:38:36] [flow] screen=continue url=https://auth.openai.com/email-verification
+[14:38:37] [flow] clicked password button: Continue with password
+[14:38:39] [flow] screen=password_create url=https://auth.openai.com/create-account/password
+[14:38:39] [flow] password input detected: input[type="password"]
+[14:38:39] [browser] sentinel cookie oai-sc ready
+[14:38:40] [flow] human-type password (delay 120-260ms Gaussian)
+[14:38:45] [flow] submit form → expect /api/accounts/user/register response
+[14:39:05] [flow] clicked submit: button[type="submit"]
+[14:39:06] [flow] register OK (HTTP 200) — page tự navigate qua redirect
+[14:39:08] [flow] screen=otp url=https://auth.openai.com/email-verification
+[14:39:08] [browser] OTP input ready (input[name="code"])
+[14:39:09] [flow] polling OTP (recipient=legato-grunts.4g+f5ij1@icloud.com) since 2026-06-26T07:39:09+00:00
+[14:39:09] [otp:worker] polling legato-grunts.4g+f5ij1@icloud.com (timeout 90s)
+[14:39:09] [otp:worker] found 946309 (attempt 1)
+[14:39:13] [flow] got 2 OTP codes: 892861, 946309
+[14:39:13] [flow] OTP=892861 got in 3.9s
+[14:39:13] [browser] typing OTP 892861 (page=open ctx_pages_live=1/1 browser=n/a)
+[14:39:16] [browser] OTP submitted via Enter
+[14:39:16] [browser] OTP validate UI → HTTP 200
+[14:39:16] [flow] OTP OK → follow continue_url https://auth.openai.com/about-you
+[14:39:16] [flow] goto continue_url failed: Error: Page.goto: NS_BINDING_ABORTED
+Call log:
+  - navigating to "https://auth.openai.com/about-you", waiting until "domcontentloaded"
+

@@ -1,0 +1,71 @@
+EMAIL=temper-17-harvest+jnpeb0x@icloud.com MODE=pure_request OUT=test/_real_acc1.log RESULT=test/_real_pure_request_141842.json
+STARTED_AT=2026-06-26T14:18:42+07:00
+===
+[14:18:42] [signup] profile: name=Real Test age=25 locale=default
+[14:18:42] [signup] mode=pure_request → HTTP-only registration (email=temper-17-harvest+jnpeb0x@icloud.com)
+[14:18:42] [signup] pure_request: sentinel sidecar (Camoufox headless) sẽ spawn — đảm bảo sentinel-token + so-token real-browser. Set REG_SIDECAR_DISABLED=1 để tắt (NGUY HIỂM, bypass anti-ban).
+[14:18:42] [request] starting sentinel sidecar (Camoufox headless)...
+[14:18:45] [sidecar-pool] shared browser launched (proxy=no headless=True)
+[14:18:45] [sidecar] persona seeds rotated (canvas=435649027 audio=590853804 webgl='Mozilla -- ANGLE (Apple, Apple M1 Pro, OpenGL 4.1)')
+[14:18:47] [sidecar] chatgpt.com loaded
+[14:18:47] [fingerprint] OK webgl='Intel Inc.'/'Intel(R) HD Graphics 400, or similar' canvas=1198B audio=on@48000Hz plugins=5 hc=12 webdriver=off
+[14:19:17] [sidecar] /email-verification visit failed: Page.goto: Timeout 30000ms exceeded.
+Call log:
+  - navigating to "https://auth.openai.com/email-verification", waiting until "domcontentloaded"
+
+[14:19:27] [sidecar] no input visible for trusted simulation: Locator.wait_for: Timeout 10000ms exceeded.
+Call log:
+  - waiting for locator("input[name=\"code\"], input[type=\"password\"], input[name=\"username\"], input[type=\"text\"], input").first to be visible
+  -     - waiting for navigation to finish...
+  -     - navigated to "https://auth.openai.com/email-verification"
+
+[14:19:27] [request] sentinel sidecar ready
+[14:19:27] [request] [0/9] Priming chatgpt.com session (GET /auth/login)...
+[14:19:27] [_dd_s] injected (rum=0, domain=.chatgpt.com)
+[14:19:29] [request] [1a/9] Fetching providers list...
+[14:19:29] [request] [1/9] Fetching CSRF token...
+[14:19:30] [request] CSRF: b56aac2fa51739997db5...
+[14:19:30] [request] [2/8] Getting authorize URL...
+[14:19:30] [request] Auth URL: https://auth.openai.com/api/accounts/authorize?client_id=app_X8zY6vW2pQ9tR3dE7nK...
+[14:19:30] [request] [3/9] OAuth init...
+[14:19:32] [request] Device ID: e612e0b8-56dc-4005-8859-7d3521381436
+[14:19:33] [sentinel-oracle] sdk.js patch markers verified (v20260219f9f6)
+[14:19:33] [sentinel-browser] error: Error: Page.evaluate: Accessing TypedArray data over Xrays is slow, and forbidden in order to encourage performant code. To copy TypedArrays across origin boundaries, consider using Components.utils.cloneInto().
+N@debugger eval code line 234 > eval line 52 > eval:1:7358
+buildGenerateFailMessage@debugger eval code line 234 > eval line 52 > eval:1:5562
+_generateAnswerAsync@debugger eval code line 234 > eval line 52 > eval:1:6123
+getRequirementsToken@debugger eval code line 234 > eval line 52 > eval:1:4533
+__runSentinelInPage@debugger eval code line 234 > eval:65:48
+@debugger eval code line 234 > eval:85:16
+evaluate@debugger eval code:241:19
+@debugger eval code:1:44
+
+[14:19:33] [sentinel] sidecar returned None — fallback QuickJS (weak fingerprint; risk deferred ban)
+[14:19:34] [sentinel] QuickJS OK (p=461 t=1 c=1848)
+[14:19:34] [request] imported 18 cookies from sidecar
+[14:19:34] [request] [4/8] Registering account (password)...
+[14:19:34] [request] FAILED: RequestPhaseError: email temper-17-harvest+jnpeb0x@icloud.com đã được đăng ký (invalid_auth_step) — cần email mới để reg
+[14:19:34] [request] Total time: 51.94s
+[14:19:34] [request] sentinel sidecar closed
+[14:19:34] [signup] total 51.97s
+{
+  "success": false,
+  "email": "temper-17-harvest+jnpeb0x@icloud.com",
+  "password": null,
+  "name": null,
+  "age": null,
+  "user_id": null,
+  "account_id": null,
+  "phase1_seconds": 0.0,
+  "phase2_seconds": 0.0,
+  "otp_seconds": 0.0,
+  "error": "RequestPhaseError: email temper-17-harvest+jnpeb0x@icloud.com đã được đăng ký (invalid_auth_step) — cần email mới để reg",
+  "two_factor": null,
+  "two_factor_partial": null,
+  "session_token_len": 0,
+  "access_token_len": 0,
+  "cookies_count": 0,
+  "output": "/Users/vippro/Developments/gpt_signup_hybrid/test/_real_pure_request_141842.json"
+}
+===
+ENDED_AT=2026-06-26T14:19:35+07:00 EXIT=0

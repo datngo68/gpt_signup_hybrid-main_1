@@ -1,0 +1,113 @@
+EMAIL=amine_fibrin.5q+dilh7tx@icloud.com MODE=pure_request OUT=test/_k2v7_pure_152931.log RESULT=test/_real_pure_request_152931.json
+STARTED_AT=2026-06-26T15:29:31+07:00
+===
+[15:29:32] [signup] profile: name=Real Test age=23 locale=default
+[15:29:32] [signup] mode=pure_request → HTTP-only registration (email=amine_fibrin.5q+dilh7tx@icloud.com)
+[15:29:32] [signup] pure_request: sentinel sidecar (Camoufox headless) sẽ spawn — đảm bảo sentinel-token + so-token real-browser. Set REG_SIDECAR_DISABLED=1 để tắt (NGUY HIỂM, bypass anti-ban).
+[15:29:32] [request] starting sentinel sidecar (Camoufox headless)...
+[15:29:34] [sidecar-pool] shared browser launched (proxy=no headless=True)
+[15:29:34] [sidecar] persona seeds rotated (canvas=828908521 audio=364032204 webgl='Mozilla -- ANGLE (Apple, Apple M2 Max, OpenGL 4.1)')
+[15:29:35] [sentinel-oracle] sdk.js patch markers verified (v20260219f9f6)
+[15:29:35] [sidecar] sentinel sdk.js installed in main realm (add_init_script)
+[15:29:37] [sidecar] chatgpt.com loaded
+[15:29:37] [fingerprint] OK webgl='Apple'/'Apple M1, or similar' canvas=1198B audio=on@48000Hz plugins=5 hc=8 webdriver=off
+[15:29:39] [sidecar] /email-verification loaded
+[15:29:49] [sidecar] no input visible for trusted simulation: Locator.wait_for: Timeout 10000ms exceeded.
+Call log:
+  - waiting for locator("input[name=\"code\"], input[type=\"password\"], input[name=\"username\"], input[type=\"text\"], input").first to be visible
+
+[15:29:49] [request] sentinel sidecar ready
+[15:29:49] [request] [0/9] Priming chatgpt.com session (GET /auth/login)...
+[15:29:49] [_dd_s] injected (rum=0, domain=.chatgpt.com)
+[15:29:50] [request] [1a/9] Fetching providers list...
+[15:29:50] [request] [1/9] Fetching CSRF token...
+[15:29:51] [request] CSRF: 4ea3f4ff64d97a141980...
+[15:29:51] [request] [2/8] Getting authorize URL...
+[15:29:51] [request] Auth URL: https://auth.openai.com/api/accounts/authorize?client_id=app_X8zY6vW2pQ9tR3dE7nK...
+[15:29:51] [request] [3/9] OAuth init...
+[15:29:52] [request] Device ID: 5d785fb6-8503-4f3e-8426-9334e1ea4022
+[15:29:52] [sentinel] K2 sidecar cookies (n=17): ['__cf_bm', '__cflb', '_cfuvid', '_dd_s', 'cf_clearance', 'oai-did', 'oaicom-stable-id']
+[15:29:52] [sentinel] K2 synthesized auth_session_logging_id=8b094e14-2eef-4abb-a40f-20703120feff (sidecar+jar both missing)
+[15:29:58] [sidecar.K2] authorize URL ready (https://auth.openai.com/api/accounts/authorize?client_id=app_X8zY6vW2pQ9tR3dE7nK...)
+[15:30:00] [sidecar.K2] post-authorize url='https://auth.openai.com/email-verification'
+[15:30:02] [sidecar.K2] clicked password button: Continue with password
+[15:30:03] [sidecar.K2] SPA navigation settled: 'https://auth.openai.com/create-account/password'
+[15:30:03] [sidecar.K2] password input detected: input[type="password"]
+[15:30:10] [sidecar.K2] clicked submit: button[type="submit"]
+[15:30:10] [sidecar.K2] captured sentinel-token (len=3777 so_token=no)
+[15:30:10] [sentinel] K2 page-form intercept OK (len=3777 so_token=no flow=username_password_create)
+[15:30:10] [request] imported 22 cookies from sidecar
+[15:30:10] [request] [4/8] Registering account (password)...
+[15:30:11] [request] Register OK → page_type='email_otp_send' continue_url='https://auth.openai.com/api/accounts/email-otp/send'
+[15:30:11] [request] chờ 2.6s trước khi send OTP (human-like)
+[15:30:14] [request] [5/8] Sending OTP...
+[15:30:15] [request] OTP sent
+[15:30:15] [request] [6/8] Waiting for OTP...
+[15:30:15] [otp:worker] polling amine_fibrin.5q+dilh7tx@icloud.com (timeout 15s)
+[15:30:16] [otp:worker] found 735305 (attempt 1)
+[15:30:18] [request] chờ 2.3s trước khi submit OTP (human-like)
+[15:30:21] [request] code mới hơn (720358) vừa về trong lúc chờ → verify code này thay cho 735305 (giữ 735305 làm fallback)
+[15:30:21] [request] [7/9] Verifying OTP...
+[15:30:21] [request] OTP verify HTTP 401: {
+  "error": {
+    "message": "Wrong code. Please check it and try again.",
+    "type": "invalid_request_error",
+    "pa
+[15:30:21] [request] OTP sai (lần 1/4) → lấy code mới
+[15:30:21] [request] chờ 3.3s trước khi submit OTP (human-like)
+[15:30:25] [request] code mới hơn (956690) vừa về trong lúc chờ → verify code này thay cho 735305 (giữ 735305 làm fallback)
+[15:30:25] [request] [7/9] Verifying OTP...
+[15:30:25] [request] OTP verified
+[15:30:25] [sentinel-browser] error: Error: Page.evaluate: Accessing TypedArray data over Xrays is slow, and forbidden in order to encourage performant code. To copy TypedArrays across origin boundaries, consider using Components.utils.cloneInto().
+N@debugger eval code line 59 > eval:1:7358
+buildGenerateFailMessage@debugger eval code line 59 > eval:1:5562
+_generateAnswerAsync@debugger eval code line 59 > eval:1:6123
+getRequirementsToken@debugger eval code line 59 > eval:1:4533
+__runSentinelInPage@debugger eval code:72:48
+@debugger eval code line 234 > eval:5:30
+evaluate@debugger eval code:241:19
+@debugger eval code:1:44
+
+[15:30:25] [sentinel-browser] error: Error: Page.evaluate: Accessing TypedArray data over Xrays is slow, and forbidden in order to encourage performant code. To copy TypedArrays across origin boundaries, consider using Components.utils.cloneInto().
+N@debugger eval code line 59 > eval:1:7358
+buildGenerateFailMessage@debugger eval code line 59 > eval:1:5562
+_generateAnswerAsync@debugger eval code line 59 > eval:1:6123
+getRequirementsToken@debugger eval code line 59 > eval:1:4533
+__runSentinelInPage@debugger eval code:72:48
+@debugger eval code line 234 > eval:5:30
+evaluate@debugger eval code:241:19
+@debugger eval code:1:44
+
+[15:30:25] [sentinel] so-token NULL from sidecar (Observer chưa đủ events?) — gửi /create_account không có so-token (rủi ro flag)
+[15:30:25] [request] imported 22 cookies from sidecar
+[15:30:25] [request] [8/9] Creating account...
+[15:30:26] [sentinel] QuickJS OK (p=453 t=1 c=2168)
+[15:30:31] [request] Account created
+[15:30:31] [request] [9/9] Following redirect chain...
+[15:30:31] [request] Redirect chain done, callback=found
+[15:30:35] [request] Registration complete! session_token=no access_token=yes
+[15:30:35] [request] Total time: 63.40s
+[15:30:35] [request] sentinel sidecar closed
+[15:30:35] [signup] total 63.44s
+[db] session result + combo persisted atomically for amine_fibrin.5q+dilh7tx@icloud.com
+{
+  "success": true,
+  "email": "amine_fibrin.5q+dilh7tx@icloud.com",
+  "password": "D5prkik9g47@",
+  "name": "Real Test",
+  "age": 26,
+  "user_id": "user-I9MH0DWnVmrxGodTVZlb5HOJ",
+  "account_id": null,
+  "phase1_seconds": 63.39722670800984,
+  "phase2_seconds": 0.0,
+  "otp_seconds": 0.0,
+  "error": null,
+  "two_factor": null,
+  "two_factor_partial": null,
+  "session_token_len": 0,
+  "access_token_len": 2015,
+  "cookies_count": 0,
+  "output": "/Users/vippro/Developments/gpt_signup_hybrid/test/_real_pure_request_152931.json"
+}
+===
+ENDED_AT=2026-06-26T15:30:36+07:00 EXIT=0

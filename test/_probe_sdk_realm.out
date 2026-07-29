@@ -1,0 +1,19 @@
+loaded chatgpt.com
+sdk.js fetched: 30862 bytes
+[sentinel-oracle] sdk.js patch markers verified (v20260219f9f6)
+
+=== A: page.evaluate eval(sdk) ===
+  FAILED: Error: Page.evaluate: Accessing TypedArray data over Xrays is slow, and forbidden in order to encourage performant code. To copy TypedArrays across origin boundaries, consider using Components.utils.cloneInt
+
+=== B: add_init_script install + evaluate call ===
+  installed via add_init_script: ready=True
+  FAILED: Error: Page.evaluate: Accessing TypedArray data over Xrays is slow, and forbidden in order to encourage performant code. To copy TypedArrays across origin boundaries, consider using Components.utils.cloneInt
+
+=== C: page.add_script_tag(content=install_script) ===
+  FAILED: Error: Page.add_script_tag: [JavaScript Error: "Content-Security-Policy: The page’s settings blocked an inline script (script-src-elem) from being executed because it violates the following directive: “scrip
+
+=== D: about:blank base + add_script_tag ===
+  installed: ready=False
+
+=== E: expose_function callback ===
+  FAILED via callback: Error: Accessing TypedArray data over Xrays is slow, and forbidden in order to encourage performant code. To copy TypedArrays across origin boundaries, consider using Components.utils.cloneInto().

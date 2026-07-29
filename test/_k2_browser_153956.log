@@ -1,0 +1,89 @@
+EMAIL=ibises.barons-8d+oiz7lgb@icloud.com MODE=browser OUT=test/_k2_browser_153956.log RESULT=test/_real_browser_153956.json
+STARTED_AT=2026-06-26T15:39:56+07:00
+===
+[15:39:57] [signup] profile: name=Real Test age=28 locale=default
+[15:39:57] [signup] phase 1: browser → email-verification → submit OTP → /about-you (email=ibises.barons-8d+oiz7lgb@icloud.com)
+[15:39:57] [browser] device_id=4f4bd764-06f6-4cc0-bc84-db2de9055dd3
+[15:39:57] [browser] locale=default en-US (no proxy)
+[15:39:57] [browser] navigator.languages=['en-US', 'en']
+[15:40:11] [browser] chatgpt.com loaded
+[15:40:13] [fingerprint] OK webgl='Google Inc. (Intel)'/'ANGLE (Intel, Intel(R) HD Graphics Direct3D11 vs_5' canvas=1198B audio=on@48000Hz plugins=5 hc=8 webdriver=off
+[15:40:13] [browser] auth_session_logging_id=d1d72db8-12ee-4f27-8600-29091cfcf574 (gen — cookie missing)
+[15:40:13] [browser] bootstrapping NextAuth (csrf + signin)...
+[15:41:33] [browser] authorize URL ready: https://auth.openai.com/api/accounts/authorize?client_id=app_X8zY6vW2pQ9tR3dE7nK1jL5gH&scope=openid%20email%20profile%20...
+[15:41:50] [flow] screen=continue url=https://auth.openai.com/email-verification
+[15:41:54] [flow] click password button failed: Locator.click: Timeout 3000ms exceeded.
+Call log:
+  - waiting for locator("button:has-text(\"password\"), a:has-text(\"password\"), [role=\"button\"]:has-text(\"password\")").first
+  -     - locator resolved to <a as="link" aria-describedby="" data-discover="true" aria-disabled="false" href="/create-account/password" class="_root_1h9ak_58 _outline_1h9ak_115">Continue with password</a>
+  -   - attempting click action
+  -     - waiting for element to be visible, enabled and stable
+  -     - element is visible, enabled and stable
+  -     - scrolling into view if needed
+  -     - done scrolling
+  -     - performing click action
+
+[15:41:56] [flow] screen=password_create url=https://auth.openai.com/create-account/password
+[15:41:56] [flow] password input detected: input[type="password"]
+[15:41:57] [browser] sentinel cookie oai-sc ready
+[15:41:57] [flow] human-type password (delay 120-260ms Gaussian)
+[15:42:00] [human_type] click before type failed (continue): Locator.click: Timeout 3000ms exceeded.
+Call log:
+  - waiting for locator("input[type=\"password\"]").first
+  -     - locator resolved to <input value="" data-rac="" form="_r_4_" type="password" spellcheck="false" name="new-password" data-focused="true" placeholder="Password" id="_r_4_-new-password" data-focus-visible="true" autocomplete="new-password" aria-describedby="_r_1_ _r_2_" class="_input_1kwl2_1 _target_1i5mj_134" aria-labelledby="react-aria4403275299-_r_d_"/>
+  -   - attempting click action
+  -     - scrolling into view if needed
+  -     - done scrolling
+  -     - forcing action
+  -     - performing click action
+
+[15:42:16] [flow] submit form → expect /api/accounts/user/register response
+[15:43:02] [flow] clicked submit: button:has-text("Continue")
+[15:43:02] [flow] expect_response /register timeout/error: TimeoutError: Timeout 30000ms exceeded while waiting for event "response" — continue detect screen
+[15:43:04] [flow] screen=otp url=https://auth.openai.com/email-verification
+[15:43:04] [browser] OTP input ready (input[name="code"])
+[15:43:05] [flow] polling OTP (recipient=ibises.barons-8d+oiz7lgb@icloud.com) since 2026-06-26T08:43:05+00:00
+[15:43:05] [otp:worker] polling ibises.barons-8d+oiz7lgb@icloud.com (timeout 90s)
+[15:43:07] [otp:worker] found 696190 (attempt 1)
+[15:43:10] [flow] got 2 OTP codes: 696190, 208620
+[15:43:10] [flow] OTP=696190 got in 4.9s
+[15:43:10] [browser] typing OTP 696190 (page=open ctx_pages_live=1/1 browser=n/a)
+[15:43:14] [browser] OTP submitted via Enter
+[15:43:14] [browser] OTP validate UI → HTTP 200
+[15:43:14] [flow] OTP OK (UI form path) — page tự nav tới https://auth.openai.com/about-you, KHÔNG goto manual
+[15:43:16] [flow] screen=about_you url=https://auth.openai.com/about-you
+[15:43:16] [browser] sentinel cookie oai-sc ready
+[15:43:16] [browser] /about-you: fill name='Real Test'
+[15:43:23] [browser] human-typed age=26
+[15:43:57] [browser] clicked button[type="submit"]
+[15:44:06] [browser] callback response OK: HTTP 302 set-cookie-has-session=True
+[15:44:07] [browser] callback URL captured (HTTP 302)
+[15:44:08] [browser] chatgpt session ready (17 cookies, _account=True)
+[15:44:08] [browser] handoff: 40 cookies, state=YTUoXFOFM687sWQ8HlDM...
+[15:44:08] [signup] phase 1 done in 251.56s (OTP 4.90s)
+[15:44:08] [signup] phase 2: HTTP extract session + access_token
+[15:44:08] [http] session-token from handoff (4059 bytes)
+[15:44:09] [signup] phase 2 done in 0.46s
+[15:44:09] [signup] total 252.01s
+[db] session result + combo persisted atomically for ibises.barons-8d+oiz7lgb@icloud.com
+{
+  "success": true,
+  "email": "ibises.barons-8d+oiz7lgb@icloud.com",
+  "password": "Vahl9ap6jns#",
+  "name": "Real Test",
+  "age": 26,
+  "user_id": "user-7EYXBiAn1FKlkTNWZI7gAIa0",
+  "account_id": "b49377ed-91c7-437f-b483-18f63e7d5c9f",
+  "phase1_seconds": 251.5561895830324,
+  "phase2_seconds": 0.45618208299856633,
+  "otp_seconds": 4.899600832955912,
+  "error": null,
+  "two_factor": null,
+  "two_factor_partial": null,
+  "session_token_len": 4059,
+  "access_token_len": 2016,
+  "cookies_count": 17,
+  "output": "/Users/vippro/Developments/gpt_signup_hybrid/test/_real_browser_153956.json"
+}
+===
+ENDED_AT=2026-06-26T15:44:09+07:00 EXIT=0

@@ -1,0 +1,91 @@
+name: Anti-Ban Suite (Phase 1-8)
+
+# Workflow chạy full test suite anti-ban + HAR alignment self-test trên mỗi PR
+# touch code REG / signup / sentinel / persona / migration. Mục tiêu: bắt
+# regression sớm — nếu PR vô tình thay đổi flow mà không update HAR golden
+# thì CI fail.
+#
+# Reference: docs/journals/260625-1224-reg-anti-ban-master-plan.md
+
+on:
+  pull_request:
+    paths:
+      - 'browser_phase.py'
+      - 'request_phase.py'
+      - 'session_phase.py'
+      - 'signup.py'
+      - 'sentinel_*.py'
+      - 'user_agent_profile.py'
+      - '_geo_locale.py'
+      - '_human_input.py'
+      - '_datadog_session.py'
+      - '_nextauth_bootstrap.py'
+      - 'random_profile.py'
+      - 'models.py'
+      - 'cli.py'
+      - 'config.py'
+      - 'db/repositories.py'
+      - 'db/schema.py'
+      - 'test/check_*.py'
+      - 'test/syntax_check_phase1.py'
+      - 'test/run_phase1_suite.sh'
+      - 'test/golden_records/**'
+      - '.github/workflows/anti-ban-suite.yml'
+  workflow_dispatch:    # cho phép manual trigger
+
+jobs:
+  test-suite:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          # Golden HAR (~70MB) lưu trong runtime/research_logs — không vào git
+          # repo (gitignored). CI bỏ qua phần HAR alignment self-test khi golden
+          # missing (handled by guard trong run_phase1_suite.sh).
+          lfs: false
+
+      - name: Setup Python 3.13
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+
+      - name: Install jq (for HAR alignment script)
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y jq
+
+      - name: Install Python dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Create venv stub (suite expects .venv/bin/python3)
+        run: |
+          mkdir -p .venv/bin
+          ln -sf "$(which python3)" .venv/bin/python3
+
+      - name: Run anti-ban suite (Phase 1-8)
+        run: |
+          set -e
+          # Skip P5 HAR alignment nếu golden HAR không tồn tại (CI không có
+          # golden 70MB). Phần test khác run bình thường.
+          if [ ! -f runtime/research_logs/web_record_20260625-120705_manual/trace.har ]; then
+            echo "::warning::Golden HAR missing — skip P5 HAR alignment (run locally)"
+            export SKIP_HAR_ALIGNMENT=1
+          fi
+          bash test/run_phase1_suite.sh
+
+      - name: Verify request_phase syntax + import
+        run: |
+          .venv/bin/python3 test/syntax_check_phase1.py
+
+      - name: Run oai-sc cookie scope verify (offline)
+        if: ${{ hashFiles('runtime/research_logs/web_record_20260625-120705_manual/trace.har') != '' }}
+        run: |
+          .venv/bin/python3 test/check_oai_sc_scope.py
+
+      - name: Migration v11→v12 test
+        run: |
+          .venv/bin/python3 test/check_migration_v12.py

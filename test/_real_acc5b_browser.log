@@ -1,0 +1,32 @@
+EMAIL=legato-grunts.4g+f5ij1@icloud.com MODE=browser OUT=test/_real_acc5b_browser.log RESULT=test/_real_browser_144158.json
+STARTED_AT=2026-06-26T14:41:58+07:00
+===
+[14:41:58] [signup] profile: name=Real Test age=19 locale=default
+[14:41:58] [signup] phase 1: browser → email-verification → submit OTP → /about-you (email=legato-grunts.4g+f5ij1@icloud.com)
+[14:41:58] [browser] device_id=ca5bf021-e594-4b94-a81c-57ebde3ec182
+[14:41:58] [browser] locale=default en-US (no proxy)
+[14:41:58] [browser] navigator.languages=['en-US', 'en']
+[14:42:03] [browser] chatgpt.com loaded
+[14:42:03] [fingerprint] OK webgl='Google Inc. (NVIDIA)'/'ANGLE (NVIDIA, NVIDIA GeForce GTX 980 Direct3D11 v' canvas=1202B audio=on@48000Hz plugins=5 hc=32 webdriver=off
+[14:42:03] [browser] auth_session_logging_id=808814b5-512d-4a74-87c1-4b3827d9ccba (gen — cookie missing)
+[14:42:03] [browser] bootstrapping NextAuth (csrf + signin)...
+[14:42:04] [browser] authorize URL ready: https://auth.openai.com/api/accounts/authorize?client_id=app_X8zY6vW2pQ9tR3dE7nK1jL5gH&scope=openid%20email%20profile%20...
+[14:42:08] [flow] screen=continue url=https://auth.openai.com/email-verification
+[14:42:10] [flow] clicked password button: Continue with password
+[14:42:11] [flow] screen=password_login url=https://auth.openai.com/log-in/password
+[14:42:11] [flow] login with password
+[14:42:29] [flow] submitted login password (human-typed)
+[14:42:32] [flow] login password wrong (Incorrect email address or password) — trying one-time code fallback
+[14:42:34] [flow] clicked 'Log in with a one-time code' — waiting for OTP screen
+[14:42:36] [flow] screen=otp url=https://auth.openai.com/email-verification
+[14:42:36] [browser] OTP input ready (input[name="code"])
+[14:42:37] [flow] polling OTP (recipient=legato-grunts.4g+f5ij1@icloud.com) since 2026-06-26T07:42:37+00:00
+[14:42:37] [otp:worker] polling legato-grunts.4g+f5ij1@icloud.com (timeout 90s)
+[14:42:37] [otp:worker] found 835988 (attempt 1)
+[14:42:41] [flow] got 3 OTP codes: 835988, 892861, 946309
+[14:42:41] [flow] OTP=835988 got in 4.0s
+[14:42:41] [browser] typing OTP 835988 (page=open ctx_pages_live=1/1 browser=n/a)
+[14:42:44] [browser] OTP submitted via Enter
+[14:42:46] [browser] OTP validate UI → HTTP 200
+[14:42:46] [flow] OTP OK → follow continue_url https://auth.openai.com/about-you
+[14:42:46] [flow] goto continue_url aborted (page đã nav song song) — OK, để state machine detect

@@ -1,0 +1,115 @@
+EMAIL=ripped.dealers_3w+tvfba5@icloud.com MODE=pure_request OUT=test/_real_acc2.log RESULT=test/_real_pure_request_142055.json
+STARTED_AT=2026-06-26T14:20:55+07:00
+===
+[14:20:56] [signup] profile: name=Real Test age=26 locale=default
+[14:20:56] [signup] mode=pure_request → HTTP-only registration (email=ripped.dealers_3w+tvfba5@icloud.com)
+[14:20:56] [signup] pure_request: sentinel sidecar (Camoufox headless) sẽ spawn — đảm bảo sentinel-token + so-token real-browser. Set REG_SIDECAR_DISABLED=1 để tắt (NGUY HIỂM, bypass anti-ban).
+[14:20:56] [request] starting sentinel sidecar (Camoufox headless)...
+[14:20:58] [sidecar-pool] shared browser launched (proxy=no headless=True)
+[14:20:58] [sidecar] persona seeds rotated (canvas=343246511 audio=361500015 webgl='Mozilla -- ANGLE (Apple, Apple M1, OpenGL 4.1)')
+[14:21:01] [sidecar] chatgpt.com loaded
+[14:21:01] [fingerprint] OK webgl='Apple'/'Apple M1, or similar' canvas=1222B audio=on@48000Hz plugins=5 hc=10 webdriver=off
+[14:21:02] [sidecar] /email-verification loaded
+[14:21:12] [sidecar] no input visible for trusted simulation: Locator.wait_for: Timeout 10000ms exceeded.
+Call log:
+  - waiting for locator("input[name=\"code\"], input[type=\"password\"], input[name=\"username\"], input[type=\"text\"], input").first to be visible
+
+[14:21:12] [request] sentinel sidecar ready
+[14:21:12] [request] [0/9] Priming chatgpt.com session (GET /auth/login)...
+[14:21:12] [_dd_s] injected (rum=0, domain=.chatgpt.com)
+[14:21:14] [request] [1a/9] Fetching providers list...
+[14:21:14] [request] [1/9] Fetching CSRF token...
+[14:21:14] [request] CSRF: ecf13381487b8ec58b52...
+[14:21:14] [request] [2/8] Getting authorize URL...
+[14:21:15] [request] Auth URL: https://auth.openai.com/api/accounts/authorize?client_id=app_X8zY6vW2pQ9tR3dE7nK...
+[14:21:15] [request] [3/9] OAuth init...
+[14:21:16] [request] Device ID: c5607dc2-8672-4fe1-956a-87b386266945
+[14:21:17] [sentinel-oracle] sdk.js patch markers verified (v20260219f9f6)
+[14:21:17] [sentinel-browser] error: Error: Page.evaluate: Accessing TypedArray data over Xrays is slow, and forbidden in order to encourage performant code. To copy TypedArrays across origin boundaries, consider using Components.utils.cloneInto().
+N@debugger eval code line 234 > eval line 52 > eval:1:7358
+buildGenerateFailMessage@debugger eval code line 234 > eval line 52 > eval:1:5562
+_generateAnswerAsync@debugger eval code line 234 > eval line 52 > eval:1:6123
+getRequirementsToken@debugger eval code line 234 > eval line 52 > eval:1:4533
+__runSentinelInPage@debugger eval code line 234 > eval:65:48
+@debugger eval code line 234 > eval:85:16
+evaluate@debugger eval code:241:19
+@debugger eval code:1:44
+
+[14:21:17] [sentinel] sidecar returned None — fallback QuickJS (weak fingerprint; risk deferred ban)
+[14:21:18] [sentinel] QuickJS OK (p=461 t=1 c=1892)
+[14:21:18] [request] imported 16 cookies from sidecar
+[14:21:18] [request] [4/8] Registering account (password)...
+[14:21:19] [request] Register OK → page_type='email_otp_send' continue_url='https://auth.openai.com/api/accounts/email-otp/send'
+[14:21:19] [request] chờ 2.8s trước khi send OTP (human-like)
+[14:21:22] [request] [5/8] Sending OTP...
+[14:21:23] [request] OTP sent
+[14:21:23] [request] [6/8] Waiting for OTP...
+[14:21:23] [otp:worker] polling ripped.dealers_3w+tvfba5@icloud.com (timeout 15s)
+[14:21:35] [otp:worker] found 027420 (attempt 3)
+[14:21:37] [request] nhận 2 OTP codes mới: 027420, 641439
+[14:21:37] [request] ưu tiên submit mã thứ 2 (641439), giữ 027420 fallback
+[14:21:37] [request] chờ 2.7s trước khi submit OTP (human-like)
+[14:21:40] [request] code mới hơn (027420) vừa về trong lúc chờ → verify code này thay cho 641439 (giữ 641439 làm fallback)
+[14:21:40] [request] [7/9] Verifying OTP...
+[14:21:41] [request] OTP verify HTTP 401: {
+  "error": {
+    "message": "Wrong code. Please check it and try again.",
+    "type": "invalid_request_error",
+    "pa
+[14:21:41] [request] OTP sai (lần 1/4) → lấy code mới
+[14:21:41] [request] chờ 3.1s trước khi submit OTP (human-like)
+[14:21:44] [request] [7/9] Verifying OTP...
+[14:21:45] [request] OTP verified
+[14:21:45] [sentinel-browser] error: Error: Page.evaluate: Accessing TypedArray data over Xrays is slow, and forbidden in order to encourage performant code. To copy TypedArrays across origin boundaries, consider using Components.utils.cloneInto().
+N@debugger eval code line 234 > eval line 52 > eval:1:7358
+buildGenerateFailMessage@debugger eval code line 234 > eval line 52 > eval:1:5562
+_generateAnswerAsync@debugger eval code line 234 > eval line 52 > eval:1:6123
+getRequirementsToken@debugger eval code line 234 > eval line 52 > eval:1:4533
+__runSentinelInPage@debugger eval code line 234 > eval:65:48
+@debugger eval code line 234 > eval:85:16
+evaluate@debugger eval code:241:19
+@debugger eval code:1:44
+
+[14:21:45] [sentinel-browser] error: Error: Page.evaluate: Accessing TypedArray data over Xrays is slow, and forbidden in order to encourage performant code. To copy TypedArrays across origin boundaries, consider using Components.utils.cloneInto().
+N@debugger eval code line 234 > eval line 52 > eval:1:7358
+buildGenerateFailMessage@debugger eval code line 234 > eval line 52 > eval:1:5562
+_generateAnswerAsync@debugger eval code line 234 > eval line 52 > eval:1:6123
+getRequirementsToken@debugger eval code line 234 > eval line 52 > eval:1:4533
+__runSentinelInPage@debugger eval code line 234 > eval:65:48
+@debugger eval code line 234 > eval:85:16
+evaluate@debugger eval code:241:19
+@debugger eval code:1:44
+
+[14:21:45] [sentinel] so-token NULL from sidecar (Observer chưa đủ events?) — gửi /create_account không có so-token (rủi ro flag)
+[14:21:45] [request] imported 17 cookies from sidecar
+[14:21:45] [request] [8/9] Creating account...
+[14:21:45] [sentinel] QuickJS OK (p=473 t=1 c=2212)
+[14:21:50] [request] Account created
+[14:21:50] [request] [9/9] Following redirect chain...
+[14:21:50] [request] Redirect chain done, callback=found
+[14:21:54] [request] Registration complete! session_token=no access_token=yes
+[14:21:54] [request] Total time: 58.03s
+[14:21:54] [request] sentinel sidecar closed
+[14:21:54] [signup] total 58.08s
+[db] session result + combo persisted atomically for ripped.dealers_3w+tvfba5@icloud.com
+{
+  "success": true,
+  "email": "ripped.dealers_3w+tvfba5@icloud.com",
+  "password": "F6ef3q3qil7@",
+  "name": "Real Test",
+  "age": 26,
+  "user_id": "user-SK4EW0Lo4qz7J8oNrHBeqXHU",
+  "account_id": null,
+  "phase1_seconds": 58.02960466593504,
+  "phase2_seconds": 0.0,
+  "otp_seconds": 0.0,
+  "error": null,
+  "two_factor": null,
+  "two_factor_partial": null,
+  "session_token_len": 0,
+  "access_token_len": 2016,
+  "cookies_count": 0,
+  "output": "/Users/vippro/Developments/gpt_signup_hybrid/test/_real_pure_request_142055.json"
+}
+===
+ENDED_AT=2026-06-26T14:21:55+07:00 EXIT=0

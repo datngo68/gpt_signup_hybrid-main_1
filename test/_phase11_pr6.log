@@ -1,0 +1,96 @@
+EMAIL=cannier-17doting+u9ehs12@icloud.com MODE=pure_request OUT=test/_phase11_pr6.log RESULT=test/_real_pure_request_181947.json
+STARTED_AT=2026-06-26T18:19:47+07:00
+===
+[18:19:47] [signup] profile: name=Real Test age=24 locale=default
+[18:19:47] [signup] mode=pure_request → HTTP-only registration (email=cannier-17doting+u9ehs12@icloud.com)
+[18:19:47] [signup] pure_request: sentinel sidecar (Camoufox headless) sẽ spawn — đảm bảo sentinel-token + so-token real-browser. Set REG_SIDECAR_DISABLED=1 để tắt (NGUY HIỂM, bypass anti-ban).
+[18:19:47] [request] starting sentinel sidecar (Camoufox headless)...
+[18:19:50] [sidecar-pool] shared browser launched (proxy=no headless=True)
+[18:19:50] [sidecar] persona seeds rotated (canvas=431975030 audio=661853516 webgl='Mozilla -- ANGLE (Apple, Apple M1 Pro, OpenGL 4.1)')
+[18:19:50] [sentinel-oracle] sdk.js patch markers verified (v20260219f9f6)
+[18:19:50] [sidecar] sentinel sdk.js installed in main realm (add_init_script)
+[18:19:52] [sidecar] chatgpt.com loaded
+[18:19:53] [fingerprint] OK webgl='Intel Inc.'/'Intel(R) HD Graphics 400, or similar' canvas=1222B audio=on@48000Hz plugins=5 hc=12 webdriver=off
+[18:19:53] [sidecar] /email-verification loaded
+[18:20:03] [sidecar] no input visible for trusted simulation: Locator.wait_for: Timeout 10000ms exceeded.
+Call log:
+  - waiting for locator("input[name=\"code\"], input[type=\"password\"], input[name=\"username\"], input[type=\"text\"], input").first to be visible
+
+[18:20:03] [request] sentinel sidecar ready
+[18:20:03] [request] [0/9] Priming chatgpt.com session (GET /auth/login)...
+[18:20:03] [_dd_s] injected (rum=0, domain=.chatgpt.com)
+[18:20:04] [request] [1a/9] Fetching providers list...
+[18:20:04] [request] [1/9] Fetching CSRF token...
+[18:20:04] [request] CSRF: 46ed4afe4430b2907656...
+[18:20:04] [request] [2/8] Getting authorize URL...
+[18:20:04] [request] Auth URL: https://auth.openai.com/api/accounts/authorize?client_id=app_X8zY6vW2pQ9tR3dE7nK...
+[18:20:04] [request] [3/9] OAuth init...
+[18:20:06] [request] Device ID: 4f218ebd-906c-4b88-ab77-35c05f96aecd
+[18:20:06] [sentinel] K2 sidecar cookies (n=20): ['__Host-next-auth.csrf-token', '__Secure-next-auth.callback-url', '__cf_bm', '__cflb', '_cfuvid', '_dd_s', 'cf_clearance', 'oai-asli', 'oai-did', 'oaicom-stable-id']
+[18:20:06] [sidecar.K2] fetch+XHR interceptor installed
+[18:20:08] [sidecar.K2] authorize URL ready (https://auth.openai.com/api/accounts/authorize?client_id=app_X8zY6vW2pQ9tR3dE7nK...)
+[18:20:10] [sidecar.K2] post-authorize url='https://auth.openai.com/email-verification'
+[18:20:12] [sidecar.K2] clicked password button: Continue with password
+[18:20:12] [sidecar.K2] SPA navigation settled: 'https://auth.openai.com/create-account/password'
+[18:20:12] [sidecar.K2] password input detected: input[autocomplete*="password"]
+[18:20:17] [sidecar.K2] force-installed interceptor pre-submit
+[18:20:19] [sidecar.K2] clicked submit: button[type="submit"]
+[18:20:19] [sidecar.K2] tokens via page.route (LEAK RISK — JS interceptor missed the request)
+[18:20:19] [sidecar.K2] captured sentinel-token (len=3713 so_token=no abort_ok=True)
+[18:20:19] [sidecar.K2] POSTs observed during K2: ['/api/auth/signin/openai']
+[18:20:19] [sentinel] K2 page-form intercept OK (len=3713 so_token=no flow=username_password_create)
+[18:20:19] [request] imported 21 cookies from sidecar
+[18:20:19] [request] [4/8] Registering account (password)...
+[18:20:20] [request] Register OK → page_type='email_otp_send' continue_url='https://auth.openai.com/api/accounts/email-otp/send'
+[18:20:20] [request] chờ 3.6s trước khi send OTP (human-like)
+[18:20:24] [request] [5/8] Sending OTP...
+[18:20:25] [request] OTP sent
+[18:20:25] [request] [6/8] Waiting for OTP...
+[18:20:25] [otp:worker] polling cannier-17doting+u9ehs12@icloud.com (timeout 15s)
+[18:20:26] [otp:worker] found 219942 (attempt 1)
+[18:20:28] [request] chờ 2.9s trước khi submit OTP (human-like)
+[18:20:31] [request] [7/9] Verifying OTP...
+[18:20:32] [request] OTP verify HTTP 401: {
+  "error": {
+    "message": "Wrong code. Please check it and try again.",
+    "type": "invalid_request_error",
+    "pa
+[18:20:32] [request] OTP sai (lần 1/4) → lấy code mới
+[18:20:32] [otp:worker] polling cannier-17doting+u9ehs12@icloud.com (timeout 15s)
+[18:20:32] [otp:worker] found 219942 (attempt 1)
+[18:20:32] [request] poll trả code đã thử (219942) → chờ code mới (lần 1)
+[18:20:37] [otp:worker] polling cannier-17doting+u9ehs12@icloud.com (timeout 15s)
+[18:20:37] [otp:worker] found 219942 (attempt 1)
+[18:20:37] [request] poll trả code đã thử (219942) → chờ code mới (lần 2)
+[18:20:42] [otp:worker] polling cannier-17doting+u9ehs12@icloud.com (timeout 15s)
+[18:20:42] [otp:worker] found 219942 (attempt 1)
+[18:20:42] [request] poll trả code đã thử (219942) → chờ code mới (lần 3)
+[18:20:47] [otp:worker] polling cannier-17doting+u9ehs12@icloud.com (timeout 15s)
+[18:20:48] [otp:worker] found 219942 (attempt 1)
+[18:20:48] [request] poll trả code đã thử (219942) → chờ code mới (lần 4)
+[18:20:53] [otp:worker] polling cannier-17doting+u9ehs12@icloud.com (timeout 15s)
+[18:20:53] [otp:worker] found 219942 (attempt 1)
+[18:20:53] [request] poll trả code đã thử (219942) → chờ code mới (lần 5)
+[18:20:58] [otp:worker] polling cannier-17doting+u9ehs12@icloud.com (timeout 15s)
+[18:20:58] [otp:worker] found 219942 (attempt 1)
+[18:20:58] [request] poll trả code đã thử (219942) → chờ code mới (lần 6)
+[18:21:03] [otp:worker] polling cannier-17doting+u9ehs12@icloud.com (timeout 15s)
+[18:21:03] [otp:worker] found 219942 (attempt 1)
+[18:21:03] [request] poll trả code đã thử (219942) → chờ code mới (lần 7)
+[18:21:08] [otp:worker] polling cannier-17doting+u9ehs12@icloud.com (timeout 15s)
+[18:21:08] [otp:worker] found 219942 (attempt 1)
+[18:21:08] [request] poll trả code đã thử (219942) → chờ code mới (lần 8)
+[18:21:13] [otp:worker] polling cannier-17doting+u9ehs12@icloud.com (timeout 15s)
+[18:21:14] [otp:worker] found 219942 (attempt 1)
+[18:21:14] [request] poll trả code đã thử (219942) → chờ code mới (lần 9)
+[18:21:19] [otp:worker] polling cannier-17doting+u9ehs12@icloud.com (timeout 15s)
+[18:21:19] [otp:worker] found 219942 (attempt 1)
+[18:21:19] [request] poll trả code đã thử (219942) → chờ code mới (lần 10)
+[18:21:24] [otp:worker] polling cannier-17doting+u9ehs12@icloud.com (timeout 15s)
+[18:21:24] [otp:worker] found 219942 (attempt 1)
+[18:21:24] [request] poll trả code đã thử (219942) → chờ code mới (lần 11)
+[18:21:29] [otp:worker] polling cannier-17doting+u9ehs12@icloud.com (timeout 15s)
+[18:21:29] [otp:worker] found 219942 (attempt 1)
+[18:21:29] [request] poll trả code đã thử (219942) → chờ code mới (lần 12)
+[18:21:29] [request] chờ 58s chưa có code mới — resend OTP (1/3)
+[18:21:30] [request] OTP resent

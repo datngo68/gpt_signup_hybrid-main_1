@@ -1,0 +1,15 @@
+=== Test 1: persistent_context=False + main_world_eval=True + page.evaluate ===
+  page.evaluate: {'canvas_ok': True, 'sum': 12750, 'len': 40000}
+
+=== Test 2: page.add_script_tag(content=...) ===
+  add_script_tag → evaluate: FAILED Error: Page.evaluate: globalThis.__probeMainRealm is not a function
+@debugger eval code line 234 > eval:1:30
+evaluate@debugger eval code:241:19
+@debugger eval code:1:44
+
+
+=== Test 3: add_init_script + page.evaluate ===
+  add_init_script → evaluate: {'canvas_ok': True, 'sum': 12750, 'len': 40000, 'realm': 'init_script'}
+
+=== Test 4: page.expose_function (Python callback) ===
+  Python callback received: None

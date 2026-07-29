@@ -1,0 +1,49 @@
+# Build context exclusions — giữ context nhỏ + KHÔNG leak secrets vào image layer.
+
+# --- Secrets (BẮT BUỘC) ---------------------------------------------------
+# Loại mọi .env (token/combo thật của dev) nhưng giữ template để tham chiếu.
+.env
+.env.*
+!.env.docker.example
+
+# --- Virtualenv / runtime state -------------------------------------------
+.venv/
+venv/
+runtime/
+*.db
+*.sqlite
+*.sqlite3
+
+# --- VCS / IDE / OS junk ---------------------------------------------------
+.git/
+.gitignore
+.idea/
+.vscode/
+.DS_Store
+
+# --- Caches ----------------------------------------------------------------
+__pycache__/
+*.pyc
+*.pyo
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+*.log
+
+# --- Project meta / docs (không cần trong image runtime) -------------------
+.claude/
+plans/
+docs/
+tasks/
+tests/
+test/
+__tests__/
+# Giữ riêng probe entitlement (manual-run trong container để check Plus sau upgrade).
+!test/probe_account_entitlement.py
+*.md
+release-manifest.json
+.repomixignore
+
+# --- Docker self (tránh recursive copy artifacts) -------------------------
+Dockerfile
+.dockerignore

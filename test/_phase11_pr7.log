@@ -1,0 +1,106 @@
+EMAIL=cannier-17doting+k8thk@icloud.com MODE=pure_request OUT=test/_phase11_pr7.log RESULT=test/_real_pure_request_183357.json
+STARTED_AT=2026-06-26T18:33:57+07:00
+===
+[18:33:57] [signup] profile: name=Real Test age=20 locale=default
+[18:33:57] [signup] mode=pure_request → HTTP-only registration (email=cannier-17doting+k8thk@icloud.com)
+[18:33:57] [signup] pure_request: sentinel sidecar (Camoufox headless) sẽ spawn — đảm bảo sentinel-token + so-token real-browser. Set REG_SIDECAR_DISABLED=1 để tắt (NGUY HIỂM, bypass anti-ban).
+[18:33:57] [request] starting sentinel sidecar (Camoufox headless)...
+[18:33:59] [sidecar-pool] shared browser launched (proxy=no headless=True)
+[18:34:00] [sidecar] persona seeds rotated (canvas=651452754 audio=364221117 webgl='Mozilla -- ANGLE (Intel Inc., Intel(R) Iris(TM) Pl')
+[18:34:00] [sentinel-oracle] sdk.js patch markers verified (v20260219f9f6)
+[18:34:00] [sidecar] sentinel sdk.js installed in main realm (add_init_script)
+[18:34:01] [sidecar] chatgpt.com loaded
+[18:34:01] [fingerprint] OK webgl='Apple'/'Apple M1, or similar' canvas=1222B audio=on@48000Hz plugins=5 hc=14 webdriver=off
+[18:34:03] [sidecar] /email-verification loaded
+[18:34:13] [sidecar] no input visible for trusted simulation: Locator.wait_for: Timeout 10000ms exceeded.
+Call log:
+  - waiting for locator("input[name=\"code\"], input[type=\"password\"], input[name=\"username\"], input[type=\"text\"], input").first to be visible
+
+[18:34:13] [request] sentinel sidecar ready
+[18:34:13] [request] [0/9] Priming chatgpt.com session (GET /auth/login)...
+[18:34:13] [_dd_s] injected (rum=0, domain=.chatgpt.com)
+[18:34:14] [request] [1a/9] Fetching providers list...
+[18:34:14] [request] [1/9] Fetching CSRF token...
+[18:34:14] [request] CSRF: fc1dfa2ea962dd880089...
+[18:34:14] [request] [2/8] Getting authorize URL...
+[18:34:14] [request] Auth URL: https://auth.openai.com/api/accounts/authorize?client_id=app_X8zY6vW2pQ9tR3dE7nK...
+[18:34:14] [request] [3/9] OAuth init...
+[18:34:15] [request] Device ID: 5be9fcad-0881-4424-97b5-3f64bfd22a4c
+[18:34:15] [sentinel] K2 sidecar cookies (n=17): ['__cf_bm', '__cflb', '_cfuvid', '_dd_s', 'cf_clearance', 'oai-did', 'oaicom-stable-id']
+[18:34:15] [sentinel] K2 synthesized auth_session_logging_id=c1f38cb0-2957-4040-a6eb-c7288d7aa114 (sidecar+jar both missing)
+[18:34:15] [sidecar.K2] fetch+XHR interceptor installed
+[18:34:17] [sidecar.K2] authorize URL ready (https://auth.openai.com/api/accounts/authorize?client_id=app_X8zY6vW2pQ9tR3dE7nK...)
+[18:34:21] [sidecar.K2] post-authorize url='https://auth.openai.com/email-verification'
+[18:34:23] [sidecar.K2] clicked password button: Continue with password
+[18:34:23] [sidecar.K2] SPA navigation settled: 'https://auth.openai.com/create-account/password'
+[18:34:23] [sidecar.K2] password input detected: input[type="password"]
+[18:34:29] [sidecar.K2] force-installed interceptor pre-submit
+[18:34:31] [sidecar.K2] clicked submit: button[type="submit"]
+[18:34:31] [sidecar.K2] tokens via page.route (LEAK RISK — JS interceptor missed the request)
+[18:34:31] [sidecar.K2] captured sentinel-token (len=3721 so_token=no abort_ok=True)
+[18:34:31] [sidecar.K2] POSTs observed during K2: ['/api/auth/signin/openai']
+[18:34:31] [sentinel] K2 page-form intercept OK (len=3721 so_token=no flow=username_password_create)
+[18:34:31] [request] imported 22 cookies from sidecar
+[18:34:31] [request] [4/8] Registering account (password)...
+[18:34:32] [request] Register OK → page_type='email_otp_send' continue_url='https://auth.openai.com/api/accounts/email-otp/send'
+[18:34:32] [request] chờ 3.7s trước khi send OTP (human-like)
+[18:34:36] [request] [5/8] Sending OTP...
+[18:34:37] [request] OTP sent
+[18:34:37] [request] [6/8] Waiting for OTP...
+[18:34:37] [otp:worker] polling cannier-17doting+k8thk@icloud.com (timeout 15s)
+[18:34:38] [otp:worker] found 895166 (attempt 1)
+[18:34:40] [request] chờ 2.5s trước khi submit OTP (human-like)
+[18:34:43] [request] [7/9] Verifying OTP...
+[18:34:43] [request] OTP verify HTTP 401: {
+  "error": {
+    "message": "Wrong code. Please check it and try again.",
+    "type": "invalid_request_error",
+    "pa
+[18:34:43] [request] OTP sai (lần 1/4) → lấy code mới
+[18:34:43] [otp:worker] polling cannier-17doting+k8thk@icloud.com (timeout 15s)
+[18:34:43] [otp:worker] found 211085 (attempt 1)
+[18:34:46] [request] chờ 3.1s trước khi submit OTP (human-like)
+[18:34:49] [request] [7/9] Verifying OTP...
+[18:34:50] [request] OTP verified
+[18:34:50] [sentinel] K2c attempt — dumped 41 caller cookies, calling intercept_create_account_token...
+[18:34:50] [sidecar.K2c] synced 41 caller cookies into sidecar context
+[18:34:50] [sidecar.K2c] fetch+XHR interceptor installed
+[18:34:51] [sidecar.K2c] navigated, url='https://auth.openai.com/about-you'
+[18:34:51] [sidecar.K2c] name input: input[name="name"]
+[18:34:57] [sidecar.K2c] filled age input: 26
+[18:34:57] [sidecar.K2c] force-installed interceptor pre-submit
+[18:34:59] [sidecar.K2c] clicked submit: button[type="submit"]
+[18:34:59] [sidecar.K2c] tokens via page.route (LEAK RISK — JS interceptor missed the request)
+[18:34:59] [sidecar.K2c] captured ca-tokens (sentinel-len=4173 so_token=yes abort_ok=True)
+[18:34:59] [sentinel] K2c create_account intercept OK (sentinel-len=4173 so_token=yes)
+[18:34:59] [request] imported 28 cookies from sidecar
+[18:34:59] [request] [8/9] Creating account...
+[18:35:04] [request] Account created
+[18:35:04] [request] [9/9] Following redirect chain...
+[18:35:04] [request] Redirect chain done, callback=found
+[18:35:09] [request] Registration complete! session_token=no access_token=yes
+[18:35:09] [request] Total time: 72.44s
+[18:35:09] [request] sentinel sidecar closed
+[18:35:09] [signup] total 72.49s
+[db] session result + combo persisted atomically for cannier-17doting+k8thk@icloud.com
+{
+  "success": true,
+  "email": "cannier-17doting+k8thk@icloud.com",
+  "password": "Ovdoh4v5sth#",
+  "name": "Real Test",
+  "age": 26,
+  "user_id": "user-UqEKaTDIkyRaWYguzJehXBQr",
+  "account_id": null,
+  "phase1_seconds": 72.44319941699996,
+  "phase2_seconds": 0.0,
+  "otp_seconds": 0.0,
+  "error": null,
+  "two_factor": null,
+  "two_factor_partial": null,
+  "session_token_len": 0,
+  "access_token_len": 2013,
+  "cookies_count": 0,
+  "output": "/Users/vippro/Developments/gpt_signup_hybrid/test/_real_pure_request_183357.json"
+}
+===
+ENDED_AT=2026-06-26T18:35:10+07:00 EXIT=0

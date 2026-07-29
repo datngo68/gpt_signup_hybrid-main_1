@@ -1,0 +1,89 @@
+EMAIL=balks_haze.4c+4vwk3w@icloud.com MODE=pure_request OUT=test/_phase11_pr1.log RESULT=test/_real_pure_request_171117.json
+STARTED_AT=2026-06-26T17:11:17+07:00
+===
+[17:11:17] [signup] profile: name=Real Test age=28 locale=default
+[17:11:17] [signup] mode=pure_request → HTTP-only registration (email=balks_haze.4c+4vwk3w@icloud.com)
+[17:11:17] [signup] pure_request: sentinel sidecar (Camoufox headless) sẽ spawn — đảm bảo sentinel-token + so-token real-browser. Set REG_SIDECAR_DISABLED=1 để tắt (NGUY HIỂM, bypass anti-ban).
+[17:11:17] [request] starting sentinel sidecar (Camoufox headless)...
+[17:11:19] [sidecar-pool] shared browser launched (proxy=no headless=True)
+[17:11:19] [sidecar] persona seeds rotated (canvas=980231674 audio=999885051 webgl='Mozilla -- ANGLE (Apple, Apple M3 Pro, OpenGL 4.1)')
+[17:11:20] [sentinel-oracle] sdk.js patch markers verified (v20260219f9f6)
+[17:11:20] [sidecar] sentinel sdk.js installed in main realm (add_init_script)
+[17:11:22] [sidecar] chatgpt.com loaded
+[17:11:22] [fingerprint] OK webgl='Apple'/'Apple M1, or similar' canvas=1198B audio=on@48000Hz plugins=5 hc=10 webdriver=off
+[17:11:25] [sidecar] /email-verification loaded
+[17:11:35] [sidecar] no input visible for trusted simulation: Locator.wait_for: Timeout 10000ms exceeded.
+Call log:
+  - waiting for locator("input[name=\"code\"], input[type=\"password\"], input[name=\"username\"], input[type=\"text\"], input").first to be visible
+
+[17:11:35] [request] sentinel sidecar ready
+[17:11:35] [request] [0/9] Priming chatgpt.com session (GET /auth/login)...
+[17:11:35] [_dd_s] injected (rum=0, domain=.chatgpt.com)
+[17:11:35] [request] [1a/9] Fetching providers list...
+[17:11:36] [request] [1/9] Fetching CSRF token...
+[17:11:36] [request] CSRF: 042c2bd6595a2b86030f...
+[17:11:36] [request] [2/8] Getting authorize URL...
+[17:11:36] [request] Auth URL: https://auth.openai.com/api/accounts/authorize?client_id=app_X8zY6vW2pQ9tR3dE7nK...
+[17:11:36] [request] [3/9] OAuth init...
+[17:11:37] [request] Device ID: dc0c089d-2b89-4560-89b9-924753a8354a
+[17:11:38] [sentinel] K2 sidecar cookies (n=19): ['__cf_bm', '__cflb', '_cfuvid', '_dd_s', 'cf_clearance', 'oai-did', 'oai-sc', 'oaicom-stable-id']
+[17:11:38] [sentinel] K2 synthesized auth_session_logging_id=dd3f1875-50a9-4c70-8057-5bf912855f26 (sidecar+jar both missing)
+[17:11:42] [sidecar.K2] authorize URL ready (https://auth.openai.com/api/accounts/authorize?client_id=app_X8zY6vW2pQ9tR3dE7nK...)
+[17:11:44] [sidecar.K2] post-authorize url='https://auth.openai.com/email-verification'
+[17:11:46] [sidecar.K2] clicked password button: Continue with password
+[17:11:48] [sidecar.K2] SPA navigation settled: 'https://auth.openai.com/create-account/password'
+[17:11:48] [sidecar.K2] password input detected: input[type="password"]
+[17:11:55] [sidecar.K2] clicked submit: button[type="submit"]
+[17:11:55] [sidecar.K2] captured sentinel-token (len=3909 so_token=no abort_ok=True)
+[17:11:55] [sentinel] K2 page-form intercept OK (len=3909 so_token=no flow=username_password_create)
+[17:11:55] [request] imported 21 cookies from sidecar
+[17:11:55] [request] [4/8] Registering account (password)...
+[17:11:56] [request] Register OK → page_type='email_otp_send' continue_url='https://auth.openai.com/api/accounts/email-otp/send'
+[17:11:56] [request] chờ 3.8s trước khi send OTP (human-like)
+[17:12:00] [request] [5/8] Sending OTP...
+[17:12:02] [request] OTP sent
+[17:12:02] [request] [6/8] Waiting for OTP...
+[17:12:02] [otp:worker] polling balks_haze.4c+4vwk3w@icloud.com (timeout 15s)
+[17:12:03] [otp:worker] found 604204 (attempt 1)
+[17:12:05] [request] chờ 3.9s trước khi submit OTP (human-like)
+[17:12:09] [request] code mới hơn (098654) vừa về trong lúc chờ → verify code này thay cho 604204 (giữ 604204 làm fallback)
+[17:12:09] [request] [7/9] Verifying OTP...
+[17:12:10] [request] OTP verified
+[17:12:10] [sentinel] K2c attempt — dumped 39 caller cookies, calling intercept_create_account_token...
+[17:12:10] [sidecar.K2c] synced 39 caller cookies into sidecar context
+[17:12:11] [sidecar.K2c] navigated, url='https://auth.openai.com/about-you'
+[17:12:11] [sidecar.K2c] name input: input[name="name"]
+[17:12:16] [sidecar.K2c] filled age input: 26
+[17:12:18] [sidecar.K2c] clicked submit: button[type="submit"]
+[17:12:18] [sidecar.K2c] captured ca-tokens (sentinel-len=4265 so_token=yes)
+[17:12:18] [sentinel] K2c create_account intercept OK (sentinel-len=4265 so_token=yes)
+[17:12:18] [request] imported 26 cookies from sidecar
+[17:12:18] [request] [8/9] Creating account...
+[17:12:19] [request] FAILED: RequestPhaseError: create_account failed: HTTP 400 - {
+  "error": {
+    "message": "There is already a user associated with the email 'b...................@icloud.com'. Please sign into that account using the same identity provider you used before, or contact us through our help center at help.openai.com if you need any assistance.",
+    "type": "inva
+[17:12:19] [request] Total time: 62.11s
+[17:12:19] [request] sentinel sidecar closed
+[17:12:19] [signup] total 62.13s
+{
+  "success": false,
+  "email": "balks_haze.4c+4vwk3w@icloud.com",
+  "password": null,
+  "name": null,
+  "age": null,
+  "user_id": null,
+  "account_id": null,
+  "phase1_seconds": 0.0,
+  "phase2_seconds": 0.0,
+  "otp_seconds": 0.0,
+  "error": "RequestPhaseError: create_account failed: HTTP 400 - {\n  \"error\": {\n    \"message\": \"There is already a user associated with the email 'b...................@icloud.com'. Please sign into that account using the same identity provider you used before, or contact us through our help center at help.openai.com if you need any assistance.\",\n    \"type\": \"inva",
+  "two_factor": null,
+  "two_factor_partial": null,
+  "session_token_len": 0,
+  "access_token_len": 0,
+  "cookies_count": 0,
+  "output": "/Users/vippro/Developments/gpt_signup_hybrid/test/_real_pure_request_171117.json"
+}
+===
+ENDED_AT=2026-06-26T17:12:19+07:00 EXIT=0

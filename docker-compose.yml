@@ -1,0 +1,62 @@
+# gpt_signup_hybrid — production compose.
+#
+#   docker compose up -d                 # web UI (mặc định)
+#   docker compose --profile hme up -d   # web + iCloud HME runner loop
+#
+# Secrets: tạo .env từ .env.docker.example, set token mạnh.
+# Deploy: bind loopback 127.0.0.1:8083 → đặt sau reverse-proxy + TLS
+# (nginx/caddy). KHÔNG expose 0.0.0.0 trực tiếp.
+#
+# ⚠ Arch: build trên Apple Silicon ra arm64. Deploy VPS amd64 phải build
+#   trên VPS đó, hoặc: docker buildx build --platform linux/amd64 -t gsh:latest .
+# ⚠ Health: plain compose KHÔNG auto-restart container 'unhealthy' (chỉ restart
+#   khi exit). Web treo nhưng còn sống → dựa reverse-proxy/orchestrator giám sát.
+# Mở UI: http://127.0.0.1:8083/?token=$GPT_SIGNUP_WEB_TOKEN (non-loopback bind
+#   KHÔNG auto-embed token vào HTML — phải truyền ?token= hoặc header X-API-Token).
+
+services:
+  web:
+    build: .
+    image: gsh:latest
+    # --unsafe-expose-network: web guard từ chối bind 0.0.0.0 nếu không opt-in.
+    # Container BẮT BUỘC bind 0.0.0.0; publish chỉ ra host 127.0.0.1 + token auth.
+    command: xvfb-run -a python -m gpt_signup_hybrid web --host 0.0.0.0 --port 8083 --unsafe-expose-network
+    env_file: .env
+    environment:
+      # Hard-required: app bind 0.0.0.0 trong container → token bắt buộc.
+      # Fail-fast lúc 'compose up' nếu thiếu (rõ ràng hơn lỗi runtime).
+      - GPT_SIGNUP_WEB_TOKEN=${GPT_SIGNUP_WEB_TOKEN:?GPT_SIGNUP_WEB_TOKEN bắt buộc (web bind 0.0.0.0)}
+    ports:
+      - "127.0.0.1:8083:8083"
+    volumes:
+      - gsh-runtime:/app/gpt_signup_hybrid/runtime
+    shm_size: "2gb"        # Firefox cần /dev/shm lớn, tránh crash
+    mem_limit: "4g"
+    restart: unless-stopped
+    healthcheck:
+      # GET / không auth → luôn 200 (web/server.py:1541). curl baked trong image.
+      test: ["CMD", "curl", "-fsS", "http://localhost:8083/"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 40s
+
+  icloud-hme:
+    build: .
+    image: gsh:latest
+    # CLI generate loop (HmeRunner). ICLOUD_API_AUTH_TOKEN KHÔNG cần ở đây
+    # (chỉ web API /api/icloud/run/* dùng); chảy qua env_file nếu set.
+    command: xvfb-run -a python -m gpt_signup_hybrid.icloud_hme generate --retry-interval 900
+    env_file: .env
+    volumes:
+      - gsh-runtime:/app/gpt_signup_hybrid/runtime
+    shm_size: "2gb"
+    mem_limit: "4g"
+    restart: unless-stopped
+    depends_on:
+      web:
+        condition: service_healthy   # serialize migrate: web (writer đầu) xong mới start
+    profiles: [hme]
+
+volumes:
+  gsh-runtime:

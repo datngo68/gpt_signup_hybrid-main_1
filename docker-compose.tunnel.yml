@@ -1,0 +1,199 @@
+# gpt_signup_hybrid — 2 instance + Cloudflare quick tunnel ra ngoài.
+#
+# Mỗi instance = port + DB + runtime volume RIÊNG (chạy song song, không đụng
+# state nhau — đúng pattern multi-instance của setup.sh).
+# Mỗi instance có 1 sidecar cloudflared tạo quick tunnel (*.trycloudflare.com).
+#
+# Chạy:
+#   docker compose -f docker-compose.tunnel.yml up -d --build
+#
+# Lấy URL quick tunnel (in trong log cloudflared):
+#   docker compose -f docker-compose.tunnel.yml logs cloudflared-1 | grep trycloudflare.com
+#   docker compose -f docker-compose.tunnel.yml logs cloudflared-2 | grep trycloudflare.com
+#
+# Mở UI (chạy --no-auth → KHÔNG cần token):
+#   https://<random>.trycloudflare.com/
+#
+# ⚠⚠ --no-auth + quick tunnel = PUBLIC INTERNET KHÔNG XÁC THỰC.
+#   Bất kỳ ai có URL đều điều khiển toàn bộ app (Reg/Session/Settings...).
+#   URL trycloudflare random nhưng KHÔNG bí mật. Tự chịu rủi ro.
+# ⚠ Arch amd64: build trên Apple Silicon ra arm64. Deploy VPS amd64:
+#   docker buildx build --platform linux/amd64 -t gsh:latest .
+
+services:
+  # ─── Instance 1 — port 8083, DB/volume riêng ───────────────────────────
+  web-1:
+    build: .
+    image: gsh:latest
+    command: xvfb-run -a python -m gpt_signup_hybrid web --host 0.0.0.0 --port 8083 --unsafe-expose-network --no-auth --hide-reg
+    env_file: .env
+    environment:
+      - RUNTIME_DIR=/app/gpt_signup_hybrid/runtime
+      - GSH_DB_PATH=/app/gpt_signup_hybrid/runtime/data.db
+    expose:
+      - "8083"
+    ports:
+      - "127.0.0.1:8083:8083"   # debug local (optional); tunnel đi qua network nội bộ
+    volumes:
+      - gsh-runtime-1:/app/gpt_signup_hybrid/runtime
+    shm_size: "2gb"
+    mem_limit: "4g"
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://localhost:8083/"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 40s
+
+  # ─── Instance 2 — port 8084, DB/volume riêng ───────────────────────────
+  web-2:
+    build: .
+    image: gsh:latest
+    command: xvfb-run -a python -m gpt_signup_hybrid web --host 0.0.0.0 --port 8084 --unsafe-expose-network --no-auth --hide-reg
+    env_file: .env
+    environment:
+      - RUNTIME_DIR=/app/gpt_signup_hybrid/runtime
+      - GSH_DB_PATH=/app/gpt_signup_hybrid/runtime/data.db
+    expose:
+      - "8084"
+    ports:
+      - "127.0.0.1:8084:8084"   # debug local (optional)
+    volumes:
+      - gsh-runtime-2:/app/gpt_signup_hybrid/runtime
+    shm_size: "2gb"
+    mem_limit: "4g"
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://localhost:8084/"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 40s
+
+  # ─── Instance 3 — port 8085, DB/volume riêng ───────────────────────────
+  web-3:
+    build: .
+    image: gsh:latest
+    command: xvfb-run -a python -m gpt_signup_hybrid web --host 0.0.0.0 --port 8085 --unsafe-expose-network --no-auth --hide-reg
+    env_file: .env
+    environment:
+      - RUNTIME_DIR=/app/gpt_signup_hybrid/runtime
+      - GSH_DB_PATH=/app/gpt_signup_hybrid/runtime/data.db
+    expose:
+      - "8085"
+    ports:
+      - "127.0.0.1:8085:8085"   # debug local (optional)
+    volumes:
+      - gsh-runtime-3:/app/gpt_signup_hybrid/runtime
+    shm_size: "2gb"
+    mem_limit: "4g"
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://localhost:8085/"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 40s
+
+  # ─── Instance 4 — port 8086, DB/volume riêng ───────────────────────────
+  web-4:
+    build: .
+    image: gsh:latest
+    command: xvfb-run -a python -m gpt_signup_hybrid web --host 0.0.0.0 --port 8086 --unsafe-expose-network --no-auth --hide-reg
+    env_file: .env
+    environment:
+      - RUNTIME_DIR=/app/gpt_signup_hybrid/runtime
+      - GSH_DB_PATH=/app/gpt_signup_hybrid/runtime/data.db
+    expose:
+      - "8086"
+    ports:
+      - "127.0.0.1:8086:8086"   # debug local (optional)
+    volumes:
+      - gsh-runtime-4:/app/gpt_signup_hybrid/runtime
+    shm_size: "2gb"
+    mem_limit: "4g"
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://localhost:8086/"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 40s
+
+  # ─── Instance 5 — port 8087, DB/volume riêng ───────────────────────────
+  web-5:
+    build: .
+    image: gsh:latest
+    command: xvfb-run -a python -m gpt_signup_hybrid web --host 0.0.0.0 --port 8087 --unsafe-expose-network --no-auth --hide-reg
+    env_file: .env
+    environment:
+      - RUNTIME_DIR=/app/gpt_signup_hybrid/runtime
+      - GSH_DB_PATH=/app/gpt_signup_hybrid/runtime/data.db
+    expose:
+      - "8087"
+    ports:
+      - "127.0.0.1:8087:8087"   # debug local (optional)
+    volumes:
+      - gsh-runtime-5:/app/gpt_signup_hybrid/runtime
+    shm_size: "2gb"
+    mem_limit: "4g"
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://localhost:8087/"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 40s
+
+  # ─── Quick tunnel cho instance 1 ───────────────────────────────────────
+  cloudflared-1:
+    image: cloudflare/cloudflared:latest
+    command: tunnel --no-autoupdate --protocol http2 --url http://web-1:8083
+    restart: unless-stopped
+    depends_on:
+      web-1:
+        condition: service_healthy
+
+  # ─── Quick tunnel cho instance 2 ───────────────────────────────────────
+  cloudflared-2:
+    image: cloudflare/cloudflared:latest
+    command: tunnel --no-autoupdate --protocol http2 --url http://web-2:8084
+    restart: unless-stopped
+    depends_on:
+      web-2:
+        condition: service_healthy
+
+  # ─── Quick tunnel cho instance 3 ───────────────────────────────────────
+  cloudflared-3:
+    image: cloudflare/cloudflared:latest
+    command: tunnel --no-autoupdate --protocol http2 --url http://web-3:8085
+    restart: unless-stopped
+    depends_on:
+      web-3:
+        condition: service_healthy
+
+  # ─── Quick tunnel cho instance 4 ───────────────────────────────────────
+  cloudflared-4:
+    image: cloudflare/cloudflared:latest
+    command: tunnel --no-autoupdate --protocol http2 --url http://web-4:8086
+    restart: unless-stopped
+    depends_on:
+      web-4:
+        condition: service_healthy
+
+  # ─── Quick tunnel cho instance 5 ───────────────────────────────────────
+  cloudflared-5:
+    image: cloudflare/cloudflared:latest
+    command: tunnel --no-autoupdate --protocol http2 --url http://web-5:8087
+    restart: unless-stopped
+    depends_on:
+      web-5:
+        condition: service_healthy
+
+volumes:
+  gsh-runtime-1:
+  gsh-runtime-2:
+  gsh-runtime-3:
+  gsh-runtime-4:
+  gsh-runtime-5:

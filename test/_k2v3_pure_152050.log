@@ -1,0 +1,120 @@
+EMAIL=beet-radar5h+0qu05g3@icloud.com MODE=pure_request OUT=test/_k2v3_pure_152050.log RESULT=test/_real_pure_request_152050.json
+STARTED_AT=2026-06-26T15:20:50+07:00
+===
+[15:20:50] [signup] profile: name=Real Test age=20 locale=default
+[15:20:50] [signup] mode=pure_request → HTTP-only registration (email=beet-radar5h+0qu05g3@icloud.com)
+[15:20:50] [signup] pure_request: sentinel sidecar (Camoufox headless) sẽ spawn — đảm bảo sentinel-token + so-token real-browser. Set REG_SIDECAR_DISABLED=1 để tắt (NGUY HIỂM, bypass anti-ban).
+[15:20:50] [request] starting sentinel sidecar (Camoufox headless)...
+[15:20:53] [sidecar-pool] shared browser launched (proxy=no headless=True)
+[15:20:53] [sidecar] persona seeds rotated (canvas=182777956 audio=979152042 webgl='Mozilla -- ANGLE (Apple, Apple M1 Pro, OpenGL 4.1)')
+[15:20:53] [sentinel-oracle] sdk.js patch markers verified (v20260219f9f6)
+[15:20:53] [sidecar] sentinel sdk.js installed in main realm (add_init_script)
+[15:20:55] [sidecar] chatgpt.com loaded
+[15:20:55] [fingerprint] OK webgl='Apple'/'Apple M1, or similar' canvas=1222B audio=on@48000Hz plugins=5 hc=10 webdriver=off
+[15:20:58] [sidecar] /email-verification loaded
+[15:21:08] [sidecar] no input visible for trusted simulation: Locator.wait_for: Timeout 10000ms exceeded.
+Call log:
+  - waiting for locator("input[name=\"code\"], input[type=\"password\"], input[name=\"username\"], input[type=\"text\"], input").first to be visible
+
+[15:21:08] [request] sentinel sidecar ready
+[15:21:08] [request] [0/9] Priming chatgpt.com session (GET /auth/login)...
+[15:21:08] [_dd_s] injected (rum=0, domain=.chatgpt.com)
+[15:21:09] [request] [1a/9] Fetching providers list...
+[15:21:09] [request] [1/9] Fetching CSRF token...
+[15:21:10] [request] CSRF: 7f34fa4272c074eaf3e4...
+[15:21:10] [request] [2/8] Getting authorize URL...
+[15:21:10] [request] Auth URL: https://auth.openai.com/api/accounts/authorize?client_id=app_X8zY6vW2pQ9tR3dE7nK...
+[15:21:10] [request] [3/9] OAuth init...
+[15:21:12] [request] Device ID: 60880ebc-6ce2-4198-9e70-0f88589770ef
+[15:21:12] [sentinel] K2 sidecar cookies (n=17): ['__cf_bm', '__cflb', '_cfuvid', '_dd_s', 'cf_clearance', 'oai-did', 'oaicom-stable-id']
+[15:21:12] [sentinel] K2 skipped — auth_session_logging_id missing in jar (bootstrap may have failed)
+[15:21:12] [sentinel-browser] error: Error: Page.evaluate: Accessing TypedArray data over Xrays is slow, and forbidden in order to encourage performant code. To copy TypedArrays across origin boundaries, consider using Components.utils.cloneInto().
+N@debugger eval code line 59 > eval:1:7358
+buildGenerateFailMessage@debugger eval code line 59 > eval:1:5562
+_generateAnswerAsync@debugger eval code line 59 > eval:1:6123
+getRequirementsToken@debugger eval code line 59 > eval:1:4533
+__runSentinelInPage@debugger eval code:72:48
+@debugger eval code line 234 > eval:5:30
+evaluate@debugger eval code:241:19
+@debugger eval code:1:44
+
+[15:21:12] [sentinel] sidecar returned None — fallback QuickJS (weak fingerprint; risk deferred ban)
+[15:21:13] [sentinel] QuickJS OK (p=453 t=1 c=1848)
+[15:21:13] [request] imported 17 cookies from sidecar
+[15:21:13] [request] [4/8] Registering account (password)...
+[15:21:14] [request] Register OK → page_type='email_otp_send' continue_url='https://auth.openai.com/api/accounts/email-otp/send'
+[15:21:14] [request] chờ 3.5s trước khi send OTP (human-like)
+[15:21:18] [request] [5/8] Sending OTP...
+[15:21:19] [request] OTP sent
+[15:21:19] [request] [6/8] Waiting for OTP...
+[15:21:19] [otp:worker] polling beet-radar5h+0qu05g3@icloud.com (timeout 15s)
+[15:21:20] [otp:worker] found 329983 (attempt 1)
+[15:21:22] [request] chờ 2.1s trước khi submit OTP (human-like)
+[15:21:24] [request] [7/9] Verifying OTP...
+[15:21:25] [request] OTP verify HTTP 401: {
+  "error": {
+    "message": "Wrong code. Please check it and try again.",
+    "type": "invalid_request_error",
+    "pa
+[15:21:25] [request] OTP sai (lần 1/4) → lấy code mới
+[15:21:25] [otp:worker] polling beet-radar5h+0qu05g3@icloud.com (timeout 15s)
+[15:21:25] [otp:worker] found 329983 (attempt 1)
+[15:21:25] [request] poll trả code đã thử (329983) → chờ code mới (lần 1)
+[15:21:30] [otp:worker] polling beet-radar5h+0qu05g3@icloud.com (timeout 15s)
+[15:21:30] [otp:worker] found 774253 (attempt 1)
+[15:21:33] [request] chờ 2.5s trước khi submit OTP (human-like)
+[15:21:36] [request] [7/9] Verifying OTP...
+[15:21:36] [request] OTP verified
+[15:21:36] [sentinel-browser] error: Error: Page.evaluate: Accessing TypedArray data over Xrays is slow, and forbidden in order to encourage performant code. To copy TypedArrays across origin boundaries, consider using Components.utils.cloneInto().
+N@debugger eval code line 59 > eval:1:7358
+buildGenerateFailMessage@debugger eval code line 59 > eval:1:5562
+_generateAnswerAsync@debugger eval code line 59 > eval:1:6123
+getRequirementsToken@debugger eval code line 59 > eval:1:4533
+__runSentinelInPage@debugger eval code:72:48
+@debugger eval code line 234 > eval:5:30
+evaluate@debugger eval code:241:19
+@debugger eval code:1:44
+
+[15:21:36] [sentinel-browser] error: Error: Page.evaluate: Accessing TypedArray data over Xrays is slow, and forbidden in order to encourage performant code. To copy TypedArrays across origin boundaries, consider using Components.utils.cloneInto().
+N@debugger eval code line 59 > eval:1:7358
+buildGenerateFailMessage@debugger eval code line 59 > eval:1:5562
+_generateAnswerAsync@debugger eval code line 59 > eval:1:6123
+getRequirementsToken@debugger eval code line 59 > eval:1:4533
+__runSentinelInPage@debugger eval code:72:48
+@debugger eval code line 234 > eval:5:30
+evaluate@debugger eval code:241:19
+@debugger eval code:1:44
+
+[15:21:36] [sentinel] so-token NULL from sidecar (Observer chưa đủ events?) — gửi /create_account không có so-token (rủi ro flag)
+[15:21:36] [request] imported 18 cookies from sidecar
+[15:21:36] [request] [8/9] Creating account...
+[15:21:37] [sentinel] QuickJS OK (p=445 t=1 c=2188)
+[15:21:41] [request] Account created
+[15:21:41] [request] [9/9] Following redirect chain...
+[15:21:41] [request] Redirect chain done, callback=found
+[15:21:45] [request] Registration complete! session_token=no access_token=yes
+[15:21:45] [request] Total time: 54.45s
+[15:21:45] [request] sentinel sidecar closed
+[15:21:45] [signup] total 54.48s
+[db] session result + combo persisted atomically for beet-radar5h+0qu05g3@icloud.com
+{
+  "success": true,
+  "email": "beet-radar5h+0qu05g3@icloud.com",
+  "password": "Ycex28mskf8@",
+  "name": "Real Test",
+  "age": 26,
+  "user_id": "user-DB92ppThRHathfhfy0WaVJkb",
+  "account_id": null,
+  "phase1_seconds": 54.452451666933484,
+  "phase2_seconds": 0.0,
+  "otp_seconds": 0.0,
+  "error": null,
+  "two_factor": null,
+  "two_factor_partial": null,
+  "session_token_len": 0,
+  "access_token_len": 2011,
+  "cookies_count": 0,
+  "output": "/Users/vippro/Developments/gpt_signup_hybrid/test/_real_pure_request_152050.json"
+}
+===
+ENDED_AT=2026-06-26T15:21:45+07:00 EXIT=0

@@ -1,0 +1,146 @@
+=== P0_P1_otp ===
+[1/4] AST parse browser_phase.py...
+      ✓ syntax OK
+      ✓ _submit_otp_via_api return annotation = str | None
+      ✓ _submit_otp return annotation = str | None
+      ✓ _submit_otp dùng expect_response + human_type + Enter
+      ✓ goto(otp_continue_url) xuất hiện 3 lần trong flow
+      ✓ API fallback (P0) vẫn goto continue_url
+[2/4] Case A: 200 + body có continue_url → return URL
+      log: [browser] OTP fallback API → HTTP 200 body={"continue_url": "https://auth.openai.com/about-you", "method": "GET", "page": {"type": "about_you"}}
+      ✓ continue_url='https://auth.openai.com/about-you'
+[3/4] Case B: 200 + body JSON thiếu continue_url → None
+      log: [browser] OTP fallback API → HTTP 200 body={"method":"GET"}
+      log: [browser] OTP fallback API: response thiếu continue_url field
+      ✓ None
+      Case C: 200 + body không phải JSON → None
+      log: [browser] OTP fallback API → HTTP 200 body=<html>error</html>
+      log: [browser] OTP fallback API: body không phải JSON, không có continue_url
+      ✓ None
+      Case D: 200 + body rỗng → None
+      log: [browser] OTP fallback API → HTTP 200 body=
+      log: [browser] OTP fallback API: empty body, không có continue_url
+      ✓ None
+      Case E: 200 + body là array (không phải object) → None
+      log: [browser] OTP fallback API → HTTP 200 body=[]
+      log: [browser] OTP fallback API: body không phải object (got list)
+      ✓ None
+      Case F: 200 + continue_url chỉ chứa whitespace → None
+      log: [browser] OTP fallback API → HTTP 200 body={"continue_url": "   "}
+      log: [browser] OTP fallback API: response thiếu continue_url field
+      ✓ None
+[4/4] Error cases
+      Case G: HTTP 400 → raise BrowserPhaseError
+      log: [browser] OTP fallback API → HTTP 400 body={"error":"bad"}
+      ✓ raised: OTP validate API rejected: HTTP 400: {"error":"bad"}
+      Case H: HTTP 500 → raise BrowserPhaseError
+      log: [browser] OTP fallback API → HTTP 500 body=internal
+      ✓ raised: OTP validate API rejected: HTTP 500: internal
+      Case I: ctx.request = None → raise BrowserPhaseError
+      ✓ raised: OTP fallback failed: context.request không khả dụng (Camoufox/Playwright version cũ?)
+
+All checks passed.
+[EXIT=0]
+
+=== P2_password_create ===
+[1/6] AST parse browser_phase.py...
+      ✓ syntax OK
+      branch length: 7174 chars
+[2/6] password_create branch KHÔNG còn random_mouse_wander call...
+      ✓ random_mouse_wander đã bỏ
+[3/6] _wait_oai_sc timeout = 8.0...
+      ✓ _wait_oai_sc timeout 8.0
+[4/6] Password input selector đầu có timeout 15000...
+      ✓ selector đầu timeout 15000ms (cho SPA render)
+[5/6] Thứ tự: find input TRƯỚC wait oai-sc TRƯỚC human_type...
+      ✓ find input (1507) → wait oai-sc (2671) → human_type (3266)
+[6/6] Submit button is_enabled timeout 2000ms...
+      ✓ submit is_enabled timeout 2000ms
+
+All P2 checks passed.
+[EXIT=0]
+
+=== P3_sentinel_token ===
+[1/6] AST parse changed files...
+      ✓ sentinel_browser.py
+      ✓ request_phase.py
+      ✓ session_phase.py
+      ✓ openai_sentinel_in_page.js exists (3826 bytes)
+[2/6] SentinelBrowserOracle API...
+      ✓ __init__(self, page, ctx)
+      ✓ async get_token(*, device_id, flow, log_prefix)
+[3/6] openai_sentinel_in_page.js content...
+      ✓ all 10 markers present
+      ✓ no real-env overrides (canvas/WebGL/audio uses real browser)
+[4/6] request_phase._get_sentinel_token_async...
+      ✓ async def signature has browser_oracle keyword
+      ✓ body: oracle.get_token → fallback asyncio.to_thread
+      ✓ priority order correct (oracle first)
+[5/6] session_phase wired to oracle + async helper...
+      ✓ no sync _get_sentinel_token() calls in session_phase
+      ✓ 2 async calls forward sentinel_oracle
+[6/6] Smoke SentinelBrowserOracle mocks...
+      ✓ happy path: token assembled correctly
+      ✓ page.evaluate fail → return None
+      ✓ /sentinel/req HTTP 500 → return None
+      ✓ empty request_p → return None
+
+All sentinel-token-source checks passed.
+[EXIT=0]
+
+=== P9_headless_fingerprint ===
+[1/5] AST parse changed files...
+      ✓ sentinel_browser.py
+      ✓ browser_phase.py
+      ✓ session_phase.py
+[2/5] verify_fingerprint_health helper signature...
+      ✓ async def verify_fingerprint_health(page, *, log, strict)
+      ✓ helper covers webgl/canvas/audio/navigator/webdriver
+[3/5] browser_phase.py wired...
+      ✓ no active fingerprint_preset=True kwarg (Phase 11.1 removed)
+      ✓ verify_fingerprint_health called 2× after chatgpt.com goto
+[4/5] session_phase.py wired...
+      ✓ no active fingerprint_preset=True kwarg (Phase 11.1 removed)
+      ✓ probe runs before oracle construction (idx probe=7340 < oracle=7479)
+[5/5] Smoke verify_fingerprint_health...
+      ✓ healthy snapshot → healthy=True
+      ✓ empty WebGL → webgl_*_empty
+      ✓ canvas_length<300 → canvas_too_short
+      ✓ audio_context=False → audio_context_missing
+      ✓ hardware_concurrency=0 → hardware_concurrency_zero
+      ✓ webdriver=True → navigator_webdriver_true
+      ✓ strict=True + degraded → RuntimeError
+      ✓ probe exception → healthy=False with probe_exception
+
+All Phase 9 (headless hardening) checks passed.
+[EXIT=0]
+
+=== P10_P11_sidecar_pool ===
+[1/5] AST parse changed files...
+      ✓ sentinel_sidecar.py
+      ✓ request_phase.py
+      ✓ signup.py
+[2/5] SentinelSidecar API surface...
+      ✓ SentinelSidecar.__init__(*, proxy, headless, locale, log, os_target)
+      ✓ sync methods: start, close, get_sentinel_token, get_so_token, dump_cookies
+      ✓ SentinelSidecarPool: instance, acquire, release, shutdown_all, stats
+      ✓ _SharedBrowser: start, shutdown, add_ref/release_ref, acquire_context/release_context
+      ✓ shared browser uses persistent_context=False (multi-context)
+      ✓ atexit handler registered for clean shutdown
+      ✓ trusted input via page.mouse + page.keyboard (isTrusted=true)
+      ✓ per-context persona rotation (canvas/audio/font/WebGL seeds)
+[3/5] request_phase wiring...
+      ✓ _step_create_account has so_token + sets openai-sentinel-so-token header
+      ✓ _run_request_phase_sync(request, mail_provider, log, on_checkpoint, sidecar)
+      ✓ sidecar.get_sentinel_token called 2× (register + create_account)
+      ✓ sidecar.get_so_token called for create_account
+      ✓ _import_cookies_from_sidecar invoked (register + create_account)
+      ✓ cookie import precedes /register POST
+      ✓ run_request_phase spawns/closes sidecar + REG_SIDECAR_DISABLED env flag
+[4/5] signup.py pure_request warning...
+      ✓ old so-token-missing warning replaced with sidecar note
+[5/5] SentinelSidecar smoke (mocked Camoufox + pool + Phase 11)...
+      → installing mocks...
+      → mocks installed, importing sentinel_sidecar...
+      → sentinel_sidecar imported
+      → starting sidecar...

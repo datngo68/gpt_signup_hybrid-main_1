@@ -1,0 +1,38 @@
+# Minimal deps cho PyInstaller build exe Windows (CI).
+#
+# Dùng version RANGE (>=) thay vì pin chặt — pip resolver tự pick latest stable
+# tương thích. Lý do: requirements.txt (Mac dev) có vài pin version không có
+# trên PyPI fresh (vd starlette==1.0.0, requests==2.34.2) hoặc Mac-only
+# (pyobjc-*).
+#
+# requirements.txt   = Mac/Linux dev (full lock).
+# requirements-build = Win CI build exe (lean, range).
+
+# --- Web framework ---
+fastapi>=0.115,<0.140
+uvicorn>=0.30,<0.50
+pydantic>=2.9,<3
+typer>=0.12,<1
+typing_extensions>=4.10
+
+# --- HTTP clients (curl_cffi giữ pin vì có native lib) ---
+curl_cffi==0.15.0
+httpx[socks]>=0.27,<1
+requests>=2.31
+urllib3>=2.0
+certifi
+PySocks>=1.7
+
+# --- Browser automation (Playwright pin vì spec test với 1.49) ---
+playwright==1.49.1
+playwright-stealth>=2.0.0
+
+# --- App-specific ---
+pyotp>=2.9
+qrcode[pil]>=7.4
+orjson>=3.10
+PyYAML>=6
+faker>=20
+
+# --- C-bindings (curl_cffi extras) ---
+cffi>=1.16

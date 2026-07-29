@@ -1,0 +1,128 @@
+EMAIL=trachea-snaps.0y+qn2pfes@icloud.com MODE=pure_request OUT=test/_phase11_pr4.log RESULT=test/_real_pure_request_173240.json
+STARTED_AT=2026-06-26T17:32:40+07:00
+===
+[17:32:40] [signup] profile: name=Real Test age=22 locale=default
+[17:32:40] [signup] mode=pure_request → HTTP-only registration (email=trachea-snaps.0y+qn2pfes@icloud.com)
+[17:32:40] [signup] pure_request: sentinel sidecar (Camoufox headless) sẽ spawn — đảm bảo sentinel-token + so-token real-browser. Set REG_SIDECAR_DISABLED=1 để tắt (NGUY HIỂM, bypass anti-ban).
+[17:32:40] [request] starting sentinel sidecar (Camoufox headless)...
+[17:32:46] [sidecar-pool] shared browser launched (proxy=no headless=True)
+[17:32:46] [sidecar] persona seeds rotated (canvas=295691700 audio=292498656 webgl='Mozilla -- ANGLE (Apple, Apple M2 Max, OpenGL 4.1)')
+[17:32:47] [sentinel-oracle] sdk.js patch markers verified (v20260219f9f6)
+[17:32:47] [sidecar] sentinel sdk.js installed in main realm (add_init_script)
+[17:32:48] [sidecar] chatgpt.com loaded
+[17:32:49] [fingerprint] OK webgl='Apple'/'Apple M1, or similar' canvas=1198B audio=on@48000Hz plugins=5 hc=14 webdriver=off
+[17:32:53] [sidecar] /email-verification loaded
+[17:33:03] [sidecar] no input visible for trusted simulation: Locator.wait_for: Timeout 10000ms exceeded.
+Call log:
+  - waiting for locator("input[name=\"code\"], input[type=\"password\"], input[name=\"username\"], input[type=\"text\"], input").first to be visible
+
+[17:33:03] [request] sentinel sidecar ready
+[17:33:03] [request] [0/9] Priming chatgpt.com session (GET /auth/login)...
+[17:33:03] [_dd_s] injected (rum=0, domain=.chatgpt.com)
+[17:33:03] [request] [1a/9] Fetching providers list...
+[17:33:03] [request] [1/9] Fetching CSRF token...
+[17:33:04] [request] CSRF: 4740947c99f3213ece1d...
+[17:33:04] [request] [2/8] Getting authorize URL...
+[17:33:04] [request] Auth URL: https://auth.openai.com/api/accounts/authorize?client_id=app_X8zY6vW2pQ9tR3dE7nK...
+[17:33:04] [request] [3/9] OAuth init...
+[17:33:05] [request] Device ID: 14a94f8a-380a-4798-b4eb-36e17a0ad5c7
+[17:33:06] [sentinel] K2 sidecar cookies (n=17): ['__cf_bm', '__cflb', '_cfuvid', '_dd_s', 'cf_clearance', 'oai-did', 'oaicom-stable-id']
+[17:33:06] [sentinel] K2 synthesized auth_session_logging_id=35ac4925-71bd-4203-b18f-4060d8303329 (sidecar+jar both missing)
+[17:33:06] [sidecar.K2] fetch+XHR interceptor installed
+[17:33:08] [sidecar.K2] authorize URL ready (https://auth.openai.com/api/accounts/authorize?client_id=app_X8zY6vW2pQ9tR3dE7nK...)
+[17:33:12] [sidecar.K2] post-authorize url='https://auth.openai.com/email-verification'
+[17:33:16] [sidecar.K2] clicked password button: Continue with password
+[17:33:16] [sidecar.K2] SPA navigation settled: 'https://auth.openai.com/create-account/password'
+[17:33:16] [sidecar.K2] password input detected: input[autocomplete*="password"]
+[17:33:21] [sidecar.K2] force-installed interceptor pre-submit
+[17:33:22] [sidecar.K2] clicked submit: button[type="submit"]
+[17:33:22] [sidecar.K2] tokens via page.route (LEAK RISK — JS interceptor missed the request)
+[17:33:22] [sidecar.K2] captured sentinel-token (len=3781 so_token=no abort_ok=True)
+[17:33:22] [sidecar.K2] POSTs observed during K2: ['/api/auth/signin/openai']
+[17:33:22] [sentinel] K2 page-form intercept OK (len=3781 so_token=no flow=username_password_create)
+[17:33:22] [request] imported 19 cookies from sidecar
+[17:33:22] [request] [4/8] Registering account (password)...
+[17:33:23] [request] Register OK → page_type='email_otp_send' continue_url='https://auth.openai.com/api/accounts/email-otp/send'
+[17:33:23] [request] chờ 3.8s trước khi send OTP (human-like)
+[17:33:27] [request] [5/8] Sending OTP...
+[17:33:28] [request] OTP sent
+[17:33:28] [request] [6/8] Waiting for OTP...
+[17:33:28] [otp:worker] polling trachea-snaps.0y+qn2pfes@icloud.com (timeout 15s)
+[17:33:29] [otp:worker] found 317025 (attempt 1)
+[17:33:31] [request] chờ 2.6s trước khi submit OTP (human-like)
+[17:33:34] [request] code mới hơn (336914) vừa về trong lúc chờ → verify code này thay cho 317025 (giữ 317025 làm fallback)
+[17:33:34] [request] [7/9] Verifying OTP...
+[17:33:35] [request] OTP verified
+[17:33:35] [sentinel] K2c attempt — dumped 37 caller cookies, calling intercept_create_account_token...
+[17:33:35] [sidecar.K2c] synced 37 caller cookies into sidecar context
+[17:33:35] [sidecar.K2c] fetch+XHR interceptor installed
+[17:33:37] [sidecar.K2c] navigated, url='https://auth.openai.com/about-you'
+[17:33:37] [sidecar.K2c] name input: input[name="name"]
+[17:33:40] [human_type] click before type failed (continue): Locator.click: Timeout 3000ms exceeded.
+Call log:
+  - waiting for locator("input[name=\"name\"]").first
+  -     - locator resolved to <input value="" type="text" required="" data-rac="" name="name" autofocus="" form="_R_35H3_" id="_R_35H3_-name" autocomplete="name" placeholder="Full name" aria-labelledby="react-aria-_R_5dcj5H1_" class="_input_1kwl2_1 _target_1i5mj_134" aria-describedby="react-aria-_R_5dcj5H3_ react-aria-_R_5dcj5H4_"/>
+  -   - attempting click action
+  -     - scrolling into view if needed
+  -     - done scrolling
+  -     - forcing action
+  -     - performing click action
+
+[17:33:43] [sidecar.K2c] Tab + typed age: 26
+[17:33:44] [sidecar.K2c] force-installed interceptor pre-submit
+[17:33:46] [sidecar.K2c] clicked submit: button[type="submit"]
+[17:34:49] [sidecar.K2c] neither JS interceptor nor page.route fired in 60s — url='https://auth.openai.com/about-you'
+[17:34:49] [sentinel] K2c returned None — see [sidecar.K2c] logs above for reason; fallback page.evaluate/QuickJS
+[17:34:49] [sentinel-browser] error: Error: Page.evaluate: Accessing TypedArray data over Xrays is slow, and forbidden in order to encourage performant code. To copy TypedArrays across origin boundaries, consider using Components.utils.cloneInto().
+N@debugger eval code line 59 > eval:1:7358
+buildGenerateFailMessage@debugger eval code line 59 > eval:1:5562
+_generateAnswerAsync@debugger eval code line 59 > eval:1:6123
+getRequirementsToken@debugger eval code line 59 > eval:1:4533
+__runSentinelInPage@debugger eval code:72:48
+@debugger eval code line 234 > eval:5:30
+evaluate@debugger eval code:241:19
+@debugger eval code:1:44
+
+[17:34:49] [sentinel-browser] error: Error: Page.evaluate: Accessing TypedArray data over Xrays is slow, and forbidden in order to encourage performant code. To copy TypedArrays across origin boundaries, consider using Components.utils.cloneInto().
+N@debugger eval code line 59 > eval:1:7358
+buildGenerateFailMessage@debugger eval code line 59 > eval:1:5562
+_generateAnswerAsync@debugger eval code line 59 > eval:1:6123
+getRequirementsToken@debugger eval code line 59 > eval:1:4533
+__runSentinelInPage@debugger eval code:72:48
+@debugger eval code line 234 > eval:5:30
+evaluate@debugger eval code:241:19
+@debugger eval code:1:44
+
+[17:34:49] [sentinel] so-token NULL from sidecar (Observer chưa đủ events?) — gửi /create_account không có so-token (rủi ro flag)
+[17:34:49] [request] imported 24 cookies from sidecar
+[17:34:49] [request] [8/9] Creating account...
+[17:34:51] [sentinel] QuickJS OK (p=473 t=1 c=2148)
+[17:34:55] [request] Account created
+[17:34:55] [request] [9/9] Following redirect chain...
+[17:34:55] [request] Redirect chain done, callback=found
+[17:35:01] [request] Registration complete! session_token=no access_token=yes
+[17:35:01] [request] Total time: 140.63s
+[17:35:01] [request] sentinel sidecar closed
+[17:35:01] [signup] total 140.81s
+[db] session result + combo persisted atomically for trachea-snaps.0y+qn2pfes@icloud.com
+{
+  "success": true,
+  "email": "trachea-snaps.0y+qn2pfes@icloud.com",
+  "password": "Glasf7r2h95@",
+  "name": "Real Test",
+  "age": 26,
+  "user_id": "user-SwNSb6IfNIsSTNlfbTLS4FFX",
+  "account_id": null,
+  "phase1_seconds": 140.6250272919997,
+  "phase2_seconds": 0.0,
+  "otp_seconds": 0.0,
+  "error": null,
+  "two_factor": null,
+  "two_factor_partial": null,
+  "session_token_len": 0,
+  "access_token_len": 2016,
+  "cookies_count": 0,
+  "output": "/Users/vippro/Developments/gpt_signup_hybrid/test/_real_pure_request_173240.json"
+}
+===
+ENDED_AT=2026-06-26T17:35:02+07:00 EXIT=0
