@@ -13,6 +13,8 @@
     maxConcurrent: 1,
   };
 
+  const rotationState = new Map();
+
   // ── DOM refs ──────────────────────────────────────────────────────
   const $ = (id) => document.getElementById(id);
   const dom = {
@@ -120,6 +122,7 @@
             <div class="job-email" title="${escHtml(j.email)}">
               <span class="job-email-text">${escHtml(j.email)}</span>
               ${planBadge}
+              ${rotationState.has(id) ? `<span class="job-meta" title="${escHtml(rotationState.get(id).error || '')}">TOTP: ${escHtml(rotationState.get(id).status)}</span>` : ''}
             </div>
           </div>
           <div class="job-duration">${escHtml(fmtDuration(j.duration))}</div>
@@ -211,7 +214,7 @@
     }, 150);
   }
 
-  function refreshSecrets() {
+  function refreshSecrets(strict = false) {
     return api('/api/session/jobs/secrets').then((data) => {
       const map = data.secrets || {};
       // Replace toàn bộ cache (server là source of truth — job removed sẽ
@@ -223,6 +226,7 @@
       renderOutputs();
     }).catch((err) => {
       console.warn('[session] refreshSecrets failed:', err && err.message);
+      if (strict) throw err;
     });
   }
 
@@ -231,6 +235,8 @@
     // ngay khi user click Run) → fallback secretsCache (fetch async).
     const id = j.id;
     const emailLow = (j.email || '').toLowerCase();
+    const authoritative = secretsCache.get(id);
+    if (authoritative) return { password: authoritative.password || '', secret: authoritative.secret || '' };
     const pasted = _pastedSecretsByEmail.get(emailLow);
     if (pasted && pasted.password) {
       return { password: pasted.password, secret: pasted.secret || '' };
@@ -359,6 +365,54 @@
     dom.comboInput.scrollTop = Math.max(0, targetTop - dom.comboInput.clientHeight / 2);
   }
 
+  // Rotation is queued server-side; the durable journal owns retries.
+  window.SessionRotation = {
+    async enqueue(ids) {
+      if (!ids.length) return;
+      if (!window.confirm(`Khóa TOTP cũ của ${ids.length} tài khoản sẽ bị vô hiệu hóa. Tiếp tục?`)) return;
+      await api('/api/session/rotations', { method: 'POST', body: JSON.stringify({ job_ids: ids, confirmed: true }) });
+    },
+    async refresh() {
+      sessionCache.clear();
+      _pastedSecretsByEmail.clear();
+      _persistPastedSecrets();
+      await refreshSecrets(true);
+    },
+  };
+  const rotationBusy = new Set();
+  new MutationObserver(() => {
+    dom.jobList.querySelectorAll('[data-action="download"]').forEach((download) => {
+      const actions = download.parentElement;
+      if (actions.querySelector('[data-action="rotate-totp"]')) return;
+      const button = document.createElement('button');
+      button.className = 'icon-btn';
+      button.innerHTML = window.GptUi.icon('retry');
+      button.setAttribute('aria-label', 'Rotate TOTP');
+      button.title = 'Đổi khóa TOTP; xác nhận trước khi thực hiện';
+      button.dataset.action = 'rotate-totp';
+      button.dataset.id = download.dataset.id;
+      button.disabled = rotationBusy.has(download.dataset.id);
+      actions.appendChild(button);
+    });
+  }).observe(dom.jobList, { childList: true, subtree: true });
+  dom.jobList.addEventListener('click', async (event) => {
+    const button = event.target.closest('[data-action="rotate-totp"]');
+    if (!button) return;
+    event.stopImmediatePropagation();
+    const id = button.dataset.id;
+    if (rotationBusy.has(id)) return;
+    rotationBusy.add(id);
+    button.disabled = true;
+    try {
+      await window.SessionRotation.enqueue([id]);
+    } catch (error) {
+      await Dialog.alert({ message: error.message + '\nREAUTH_REQUIRED: cần phiên xác thực MFA mới. EXPORT_PENDING: bấm lại chỉ để đồng bộ, không đổi khóa lần nữa.' });
+    } finally {
+      rotationBusy.delete(id);
+      button.disabled = false;
+    }
+  }, true);
+
   // ── Job actions ───────────────────────────────────────────────────
   dom.jobList.addEventListener('click', (e) => {
     const actionBtn = e.target.closest('[data-action]');
@@ -378,7 +432,7 @@
         api(`/api/session/jobs/${id}`, { method: 'DELETE' }).catch(async (err) => { await Dialog.alert({ message: err.message }); });
       } else if (action === 'download' || action === 'copy-json' || action === 'copy-token') {
         // Lấy session data
-        const cached = sessionCache.get(id);
+        const cached = null; // Always read authoritative JSON after possible rotation in another tab.
         if (cached) {
           doSessionAction(action, id, cached);
         } else {
@@ -460,6 +514,7 @@
 
   dom.btnStopAll.addEventListener('click', async () => {
     try {
+      await api('/api/session/rotations/stop', { method: 'POST' });
       await api('/api/session/jobs/stop-all', { method: 'POST' });
     } catch (err) { await Dialog.alert({ message: err.message }); }
   });
@@ -485,10 +540,12 @@
   dom.btnCopyError.addEventListener('click', () => {
     window.GptUi.copyText(dom.errorPane.textContent);
   });
-  dom.btnCopyFree.addEventListener('click', () => {
+  dom.btnCopyFree.addEventListener('click', async () => {
+    await window.SessionRotation.refresh();
     window.GptUi.copyText(dom.freePane.textContent);
   });
-  dom.btnCopyPlus.addEventListener('click', () => {
+  dom.btnCopyPlus.addEventListener('click', async () => {
+    await window.SessionRotation.refresh();
     window.GptUi.copyText(dom.plusPane.textContent);
   });
 
@@ -540,8 +597,26 @@
     dom.logPane.scrollTop = dom.logPane.scrollHeight;
   }
 
+  function applyRotation(items) {
+    rotationBusy.clear();
+    rotationState.clear();
+    for (const item of items) {
+      rotationState.set(item.job_id, item);
+      if (['queued', 'running'].includes(item.status)) rotationBusy.add(item.job_id);
+    }
+    renderJobs();
+    dom.jobSummary.textContent += ' · TOTP: ' + items.map((item) => `${item.status}${item.error ? ':' + item.error : ''}`).join(', ');
+  }
+
+  api('/api/session/rotations').then((data) => applyRotation(data.items)).catch(console.error);
+
   SseBus.on('session', (data) => {
-    if (data.type === 'snapshot') {
+    if (data.type === 'rotation_refresh') {
+      window.SessionRotation.refresh();
+    } else if (data.type === 'rotation') {
+      applyRotation(data.items);
+      if (data.items.some((item) => item.status === 'success')) window.SessionRotation.refresh();
+    } else if (data.type === 'snapshot') {
       state.maxConcurrent = data.max_concurrent;
       applySnapshot(data.jobs);
     } else if (data.type === 'job') {

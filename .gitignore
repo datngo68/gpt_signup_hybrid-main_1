@@ -29,6 +29,7 @@ data/
 *.db-wal
 
 # Secrets
+.dev.var
 .env
 .env.local
 *.pem

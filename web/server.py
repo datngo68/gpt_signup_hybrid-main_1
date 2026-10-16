@@ -896,6 +896,12 @@ async def unified_sse(request: Request) -> StreamingResponse:
 @app.on_event("shutdown")
 async def on_shutdown():
     """Graceful shutdown: mark running jobs for recovery, close DB, then clear SSE."""
+    # Do not interrupt a destructive rotation. Pending items remain recoverable.
+    if _rotation_queue is not None and _rotation_queue.task is not None:
+        _rotation_queue.closing = True
+        task = _rotation_queue.task
+        if not task.done():
+            await asyncio.shield(task)
     # 1. Mark running jobs as queued for recovery on next startup + cancel workers
     manager = get_manager()
     manager.shutdown()
@@ -936,6 +942,185 @@ async def on_shutdown():
 # ─────────────────────────────────────────────────────────────────────
 # Session API (Get Session feature)
 # ─────────────────────────────────────────────────────────────────────
+
+
+@app.on_event("startup")
+async def recover_mfa_rotations():
+    from db import get_engine
+    from mfa_rotation_service import RotationService
+    service = RotationService(get_engine(), Path(os.environ.get("RUNTIME_DIR", "runtime")) / "sessions")
+    service.recover()
+    for job in get_session_manager().jobs.values():
+        state = service.journal.get(job.email)
+        if state and state.get('phase') == 'complete':
+            job.secret = state['secret']
+            if isinstance(job.session_data, dict):
+                job.session_data['two_factor'] = {'enabled': True, 'secret': state['secret']}
+    get_rotation_queue().start()
+
+
+_rotation_queue = None
+
+
+def get_rotation_queue():
+    global _rotation_queue
+    if _rotation_queue is None:
+        from db import get_engine
+        from mfa_rotation_queue import RotationQueue
+        _rotation_queue = RotationQueue(get_engine(), get_session_manager(), execute_queued_rotation,
+                                        max_concurrent=lambda: get_session_manager().max_concurrent)
+    return _rotation_queue
+
+
+async def execute_queued_rotation(job_id, operation_id):
+    await _rotate_session_totp(job_id, RotateSessionTotpRequest(operation_id=operation_id, confirmed=True))
+
+
+class QueueRotationsRequest(BaseModel):
+    job_ids: list[str] = Field(min_length=1, max_length=1000)
+    confirmed: bool
+
+
+@app.get('/api/session/rotations')
+async def list_rotations(request: Request):
+    require_token(request)
+    return JSONResponse({'items': get_rotation_queue().snapshot()}, headers={'Cache-Control': 'no-store'})
+
+
+@app.post('/api/session/rotations')
+async def queue_rotations(payload: QueueRotationsRequest, request: Request):
+    require_token(request)
+    if payload.confirmed is not True:
+        raise HTTPException(400, 'CONFIRMATION_REQUIRED')
+    operations, emails = [], set()
+    for job_id in dict.fromkeys(payload.job_ids):
+        job = get_session_manager().jobs.get(job_id)
+        if job is None or job.status != 'success' or not isinstance(job.session_data, dict):
+            raise HTTPException(409, 'SELECT_SUCCESSFUL_SESSIONS_ONLY')
+        if job.email.casefold() in emails:
+            continue
+        emails.add(job.email.casefold())
+        metadata = await rotation_operation_metadata(job_id, request)
+        operations.append((job_id, json.loads(metadata.body)['operation_id']))
+    get_rotation_queue().enqueue(operations)
+    return JSONResponse({'items': get_rotation_queue().snapshot()}, headers={'Cache-Control': 'no-store'})
+
+
+@app.post('/api/session/rotations/stop')
+async def stop_rotations(request: Request):
+    require_token(request)
+    get_rotation_queue().stop_pending()
+    return {'ok': True}
+
+
+@app.get("/api/session/jobs/{job_id}/rotate-totp")
+async def rotation_operation_metadata(job_id: str, request: Request):
+    require_token(request)
+    from db import get_engine
+    from db.mfa_rotation import RotationJournal
+    job = get_session_manager().jobs.get(job_id)
+    if job is None:
+        raise HTTPException(404, 'JOB_NOT_FOUND')
+    journal = RotationJournal(get_engine())
+    journal.install()
+    state = journal.get(job.email)
+    # Stable next ID derives only from committed state, survives browser reload.
+    import hashlib
+    previous = state.get('operation_id', '') if state else ''
+    operation = (state['operation_id'] if state and state['phase'] != 'complete' else
+                 'rotate_' + hashlib.sha256((job.email.casefold() + previous).encode()).hexdigest())
+    return JSONResponse({'operation_id': operation, 'phase': state.get('phase') if state else None},
+                        headers={'Cache-Control': 'no-store'})
+
+
+class RotateSessionTotpRequest(BaseModel):
+    operation_id: str = Field(min_length=8, max_length=128, pattern=r"^[A-Za-z0-9_-]+$")
+    confirmed: bool
+    old_secret: str | None = Field(default=None, max_length=256, repr=False)
+
+
+@app.post("/api/session/jobs/{job_id}/rotate-totp")
+async def rotate_session_totp(job_id: str, payload: RotateSessionTotpRequest, request: Request):
+    require_token(request)
+    return await _rotate_session_totp(job_id, payload)
+
+
+async def _rotate_session_totp(job_id: str, payload: RotateSessionTotpRequest):
+    if payload.confirmed is not True:
+        raise HTTPException(400, "CONFIRMATION_REQUIRED")
+    from db import get_engine
+    from mfa_rotation import RotationBlocked
+    from mfa_rotation_http import RotationTransport
+    from mfa_rotation_service import RotationService
+    from curl_cffi.requests import AsyncSession
+
+    manager = get_session_manager()
+    job = manager.jobs.get(job_id)
+    if job is None:
+        raise HTTPException(404, "JOB_NOT_FOUND")
+    if job.status != "success" or not isinstance(job.session_data, dict):
+        raise HTTPException(409, "SESSION_REQUIRED")
+    service = RotationService(get_engine(), Path(os.environ.get("RUNTIME_DIR", "runtime")) / "sessions")
+    state = service.journal.get(job.email)
+    try:
+        # Completed/activated journals need no token: retry only projects local state.
+        if state and (state.get('phase') == 'activated' or
+                      (state.get('phase') == 'complete' and
+                       (payload.operation_id == state.get('operation_id') or
+                        payload.operation_id in state.get('completed_operations', [])))):
+            result = await service.run(email=job.email, password=job.password,
+                                       operation_id=payload.operation_id)
+        else:
+            from mfa_rotation_login import resolve_rotation_session
+            old_secret = payload.old_secret or job.secret
+            original_data = job.session_data
+            data, account_id = await resolve_rotation_session(job, manager, old_secret)
+            async with AsyncSession(impersonate='firefox135') as session:
+                transport = RotationTransport(session, access_token=data.get('accessToken', ''),
+                                              account_id=account_id)
+                reauthenticated = data is not original_data
+                mutation_started = False
+
+                async def request_mfa(method, path, body):
+                    nonlocal transport, reauthenticated, mutation_started, data
+                    # Never retry a POST or any read after a potentially ambiguous mutation.
+                    if method != 'GET':
+                        mutation_started = True
+                    try:
+                        return await transport(method, path, body)
+                    except RotationBlocked as exc:
+                        if (str(exc) != 'REAUTH_REQUIRED' or method != 'GET' or
+                                mutation_started or reauthenticated or
+                                state and state.get('phase') not in ('complete', 'prepared')):
+                            raise
+                        reauthenticated = True
+                        data, refreshed_account = await resolve_rotation_session(
+                            job, manager, old_secret, force=True)
+                        if refreshed_account != account_id:
+                            raise RotationBlocked('ACCOUNT_IDENTITY_UNVERIFIED')
+                        transport = RotationTransport(session, access_token=data['accessToken'],
+                                                      account_id=account_id)
+                        return await transport(method, path, body)
+
+                result = await service.run(email=job.email, password=job.password,
+                                           operation_id=payload.operation_id, request=request_mfa)
+                # Publish only a server-accepted session; never overwrite concurrent job work.
+                if job.session_data is original_data and manager.jobs.get(job_id) is job:
+                    job.session_data = data
+        # Refresh in-memory projections without exposing the secret in the API response.
+        for target in manager.jobs.values():
+            if target.email.casefold() == job.email.casefold():
+                target.secret = result['secret']
+                if isinstance(target.session_data, dict):
+                    target.session_data['two_factor'] = {'enabled': True, 'secret': result['secret']}
+        if hasattr(manager, '_broadcast'):
+            manager._broadcast({'type': 'rotation_refresh', 'email': job.email})
+        return JSONResponse({'ok': True, 'phase': result['phase']}, headers={'Cache-Control': 'no-store'})
+    except RotationBlocked as exc:
+        code = str(exc)
+        raise HTTPException(409, code) from None
+    except Exception:
+        raise HTTPException(503, 'ROTATION_STORAGE_OR_TRANSPORT_ERROR') from None
 
 
 class AddSessionJobsRequest(BaseModel):

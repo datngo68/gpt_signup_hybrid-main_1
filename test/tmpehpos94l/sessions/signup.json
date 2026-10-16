@@ -1,0 +1,8 @@
+{
+  "email": "test@example.invalid",
+  "password": "password",
+  "two_factor": {
+    "enabled": true,
+    "secret": "JBSWY3DPEHPK3PXP"
+  }
+}

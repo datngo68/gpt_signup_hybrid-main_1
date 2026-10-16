@@ -67,16 +67,23 @@
       <button class="btn btn-ghost btn-small" data-bulk-select="invert">Đảo chọn</button>
       <button class="btn btn-ghost btn-small" data-bulk-select="none">Bỏ chọn</button>
       <button class="btn btn-primary btn-small" data-bulk-action="copy">Copy</button>
-      ${config.session ? '<button class="btn btn-ghost btn-small" data-bulk-action="json">Copy JSON</button>' : ''}
+      ${config.session ? '<button class="btn btn-ghost btn-small" data-bulk-action="json">Copy JSON</button><button class="btn btn-primary btn-small" data-bulk-action="rotate" disabled title="Đổi TOTP cho tài khoản thành công đã chọn">Rotate TOTP</button>' : ''}
       <button class="btn btn-ghost btn-small" data-bulk-action="export">Export</button>
       <button class="btn btn-ghost btn-small" data-bulk-action="retry">Retry lỗi</button>
       <button class="btn btn-ghost btn-small" data-bulk-action="remove">Xóa đã xong</button>`;
     list.before(toolbar);
 
+    const selection = new Set();
     const update = () => {
+      list.querySelectorAll('.job').forEach((row) => {
+        if (row.querySelector('.bulk-check')?.checked) selection.add(row.dataset.id);
+        else selection.delete(row.dataset.id);
+      });
       const count = selectedRows(list).length;
       toolbar.querySelector('.bulk-count').textContent = `Đã chọn ${count}`;
       toolbar.classList.toggle('has-selection', count > 0);
+      const rotate = toolbar.querySelector('[data-bulk-action="rotate"]');
+      if (rotate) rotate.disabled = !selectedRows(list).some((row) => statusOf(row) === 'success');
     };
 
     const decorate = () => {
@@ -85,6 +92,7 @@
         const box = document.createElement('input');
         box.type = 'checkbox';
         box.className = 'bulk-check';
+        box.checked = selection.has(row.dataset.id);
         box.setAttribute('aria-label', `Chọn ${emailOf(row) || 'job'}`);
         box.addEventListener('click', (event) => event.stopPropagation());
         box.addEventListener('change', update);
@@ -118,6 +126,14 @@
       const rows = selectedRows(list);
       if (!rows.length) { toast('Chưa chọn job', 'warn'); return; }
       const emails = rows.map(emailOf);
+
+      if (action === 'rotate') {
+        try {
+          await window.SessionRotation.enqueue(rows.filter((row) => statusOf(row) === 'success').map((row) => row.dataset.id));
+        } catch (error) { toast(error.message, 'error'); }
+        return;
+      }
+      if (config.session) await window.SessionRotation.refresh();
 
       if (action === 'retry' || action === 'remove') {
         let done = 0;

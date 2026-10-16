@@ -1,0 +1,8 @@
+{
+  "email": "test@example.invalid",
+  "user_id": null,
+  "two_factor": {
+    "enabled": true,
+    "secret": "JBSWY3DPEHPK3PXP"
+  }
+}

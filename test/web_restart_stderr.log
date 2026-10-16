@@ -1,0 +1,6 @@
+C:\Users\user\Downloads\Telegram Desktop\gpt_signup_hybrid-main\.venv\Lib\site-packages\fastapi\openapi\utils.py:303: UserWarning: Duplicate Operation ID unified_sse_api_sse_get for function unified_sse at C:\Users\user\Downloads\Telegram Desktop\gpt_signup_hybrid-main\web\server.py
+  warnings.warn(message, stacklevel=1)
+C:\Users\user\Downloads\Telegram Desktop\gpt_signup_hybrid-main\.venv\Lib\site-packages\fastapi\openapi\utils.py:303: UserWarning: Duplicate Operation ID unified_sse_api_sse_get for function unified_sse at C:\Users\user\Downloads\Telegram Desktop\gpt_signup_hybrid-main\web\server.py
+  warnings.warn(message, stacklevel=1)
+C:\Users\user\Downloads\Telegram Desktop\gpt_signup_hybrid-main\.venv\Lib\site-packages\fastapi\openapi\utils.py:303: UserWarning: Duplicate Operation ID unified_sse_api_sse_post for function unified_sse at C:\Users\user\Downloads\Telegram Desktop\gpt_signup_hybrid-main\web\server.py
+  warnings.warn(message, stacklevel=1)
