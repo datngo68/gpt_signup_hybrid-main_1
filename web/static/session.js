@@ -34,6 +34,8 @@
     plusCount:    $('ses-plus-count'),
     btnCopyFree:  $('ses-btn-copy-free'),
     btnCopyPlus:  $('ses-btn-copy-plus'),
+    codexThreshold: $('ses-codex-threshold'),
+    btnCopyCodex: $('ses-btn-copy-codex'),
     errorPane:    $('ses-error-pane'),
     btnCopyError: $('ses-btn-copy-error'),
     btnClearDone: $('ses-btn-clear-done'),
@@ -50,6 +52,28 @@
     return String(s).replace(/[&<>"']/g, (c) => ({
       '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;',
     }[c]));
+  }
+
+  function fmtDateShort(value) {
+    if (!value) return '';
+    const d = new Date(value);
+    if (!Number.isFinite(d.getTime())) return String(value).slice(0, 10);
+    const dd = String(d.getDate()).padStart(2, '0');
+    const mm = String(d.getMonth() + 1).padStart(2, '0');
+    const yyyy = d.getFullYear();
+    return `${dd}/${mm}/${yyyy}`;
+  }
+
+  function fmtDaysLeft(value) {
+    const d = new Date(value);
+    if (!Number.isFinite(d.getTime())) return '';
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    d.setHours(0, 0, 0, 0);
+    const days = Math.ceil((d.getTime() - today.getTime()) / 86400000);
+    if (days < 0) return `quá hạn ${Math.abs(days)} ngày`;
+    if (days === 0) return 'hết hạn hôm nay';
+    return `còn ${days} ngày`;
   }
 
   function api(path, opts = {}) {
@@ -110,8 +134,16 @@
         actionBtns = `<button class="icon-btn" data-action="retry" data-id="${escHtml(id)}" title="Retry">${window.GptUi.icon('retry')}</button>`;
       }
 
+      const quota = j.codex_quota && j.codex_quota.quotas ? j.codex_quota.quotas : {};
+      const codexBits = [];
+      if (quota.session) codexBits.push(`5h ${Math.round(quota.session.remaining)}%`);
+      if (quota.weekly) codexBits.push(`week ${Math.round(quota.weekly.remaining)}%`);
+      if (j.plan_expires) codexBits.push(`exp ${fmtDateShort(j.plan_expires)} (${fmtDaysLeft(j.plan_expires)})`);
       const planBadge = j.plan_type
         ? `<span class="plan-badge plan-${escHtml(j.plan_type.toLowerCase())}">${escHtml(j.plan_type)}</span>`
+        : '';
+      const codexBadge = codexBits.length
+        ? `<span class="plan-badge">${escHtml(codexBits.join(' · '))}</span>`
         : '';
 
       return `
@@ -122,6 +154,7 @@
             <div class="job-email" title="${escHtml(j.email)}">
               <span class="job-email-text">${escHtml(j.email)}</span>
               ${planBadge}
+              ${codexBadge}
               ${rotationState.has(id) ? `<span class="job-meta" title="${escHtml(rotationState.get(id).error || '')}">TOTP: ${escHtml(rotationState.get(id).status)}</span>` : ''}
             </div>
           </div>
@@ -257,6 +290,13 @@
     return p !== '' && p !== 'free';
   }
 
+  function _codexSessionRemaining(j) {
+    const quota = j.codex_quota && j.codex_quota.quotas;
+    const session = quota && quota.session;
+    const value = session && Number(session.remaining);
+    return Number.isFinite(value) ? value : null;
+  }
+
   function _formatAccountLine(j) {
     const { password, secret } = _resolveSecretsFor(j);
     if (!password) {
@@ -265,6 +305,20 @@
     return secret
       ? `${j.email}|${password}|${secret}`
       : `${j.email}|${password}`;
+  }
+
+  function _collectCodexLines() {
+    const threshold = Math.max(0, Math.min(100, Number(dom.codexThreshold.value || 0)));
+    const lines = [];
+    for (const id of state.order) {
+      const j = state.jobs.get(id);
+      if (!j || j.status !== 'success') continue;
+      const remaining = _codexSessionRemaining(j);
+      if (remaining == null || remaining < threshold) continue;
+      const line = _formatAccountLine(j);
+      if (line && !line.includes('đang tải secrets')) lines.push(line);
+    }
+    return lines;
   }
 
   function renderOutputs() {
@@ -303,6 +357,7 @@
     api(`/api/session/jobs/${jobId}`).then((data) => {
       if (data.session_data) {
         sessionCache.set(jobId, data.session_data);
+        renderOutputs();
       }
     }).catch(() => {});
   }
@@ -548,6 +603,11 @@
     await window.SessionRotation.refresh();
     window.GptUi.copyText(dom.plusPane.textContent);
   });
+  dom.btnCopyCodex.addEventListener('click', () => {
+    const lines = _collectCodexLines();
+    window.GptUi.copyText(lines.join('\n'));
+  });
+  dom.codexThreshold.addEventListener('input', renderOutputs);
 
   // ── SSE (via SseBus) ────────────────────────────────────────────
   function applySnapshot(jobs) {

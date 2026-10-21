@@ -2355,13 +2355,42 @@ class SessionJob:
         if not isinstance(self.session_data, dict):
             return None
         account = self.session_data.get("account")
-        if not isinstance(account, dict):
-            return None
-        pt = account.get("planType")
+        pt = account.get("planType") if isinstance(account, dict) else None
         if not isinstance(pt, str):
-            return None
+            plan_check = self.session_data.get("plan_check")
+            if isinstance(plan_check, dict):
+                pt = plan_check.get("plan")
+            if not isinstance(pt, str):
+                return None
         pt = pt.strip()
         return pt or None
+
+    def _extract_plan_expires(self) -> str | None:
+        if not isinstance(self.session_data, dict):
+            return None
+        for key in ("account", "accountPlan"):
+            item = self.session_data.get(key)
+            if isinstance(item, dict):
+                value = item.get("expires") or item.get("expiresAt") or item.get("expires_at")
+                if isinstance(value, str) and value.strip():
+                    return value.strip()
+        ent = self.session_data.get("entitlement")
+        if isinstance(ent, dict):
+            value = ent.get("expires_at") or ent.get("expiresAt")
+            if isinstance(value, str) and value.strip():
+                return value.strip()
+        plan_check = self.session_data.get("plan_check")
+        if isinstance(plan_check, dict):
+            value = plan_check.get("expires") or plan_check.get("expires_at") or plan_check.get("expiresAt")
+            if isinstance(value, str) and value.strip():
+                return value.strip()
+        return None
+
+    def _extract_codex_quota(self) -> dict[str, Any] | None:
+        if not isinstance(self.session_data, dict):
+            return None
+        quota = self.session_data.get("codex_quota")
+        return quota if isinstance(quota, dict) else None
 
     def to_dict(self) -> dict[str, Any]:
         return {
@@ -2371,6 +2400,8 @@ class SessionJob:
             "error": self.error,
             "has_session": self.session_data is not None,
             "plan_type": self._extract_plan_type(),
+            "plan_expires": self._extract_plan_expires(),
+            "codex_quota": self._extract_codex_quota(),
             "retry_count": self.retry_count,
             "created_at": self.created_at,
             "started_at": self.started_at,
@@ -2920,6 +2951,7 @@ class SessionJobManager:
             #     OTP empty, no mail provider — không retry để tránh login spam
             #     → lockout / mail provider rate-limit.
             from session_phase import (
+                get_session,
                 get_session_pure_request,
                 is_fatal_login_error,
                 strip_cookies as _strip_session_cookies,
@@ -2927,7 +2959,19 @@ class SessionJobManager:
             LOGIN_MAX_ATTEMPTS = 3
             LOGIN_RETRY_DELAY = 3.0
 
+            def _requires_browser_fallback(exc_msg: str) -> bool:
+                lower = exc_msg.lower()
+                return (
+                    "invalid_state" in lower
+                    or (
+                        "http 403" in lower
+                        and ("just a moment" in lower or "<!doctype html" in lower)
+                    )
+                )
+
             def _is_login_error_retryable(exc_msg: str) -> bool:
+                if _requires_browser_fallback(exc_msg):
+                    return True
                 return not is_fatal_login_error(exc_msg)
 
             async def _login_with_retry() -> dict[str, Any]:
@@ -2961,6 +3005,8 @@ class SessionJobManager:
                                 f"[session] login fail after "
                                 f"{LOGIN_MAX_ATTEMPTS} attempts: {err_msg[:200]}"
                             )
+                            if _requires_browser_fallback(err_msg):
+                                return {"__fallback_browser_required": True}
                             raise
                         log(
                             f"[session] login transient error "
@@ -2979,6 +3025,23 @@ class SessionJobManager:
                 _login_with_retry(),
                 timeout=self._job_timeout,
             )
+            if (
+                isinstance(session_data, dict)
+                and session_data.get("__fallback_browser_required")
+            ):
+                log("[session] pure-request blocked — fallback browser flow...")
+                session_data = await asyncio.wait_for(
+                    get_session(
+                        email=job.email,
+                        password=job.password,
+                        secret=job.secret,
+                        headless=self._headless,
+                        proxy=None,
+                        keep_browser_open=self._debug and not self._headless,
+                        log=log,
+                    ),
+                    timeout=self._job_timeout,
+                )
 
             # strip __cookies trước khi persist DB jobs / broadcast SSE (R4.5).
             job.session_data = _strip_session_cookies(session_data)
