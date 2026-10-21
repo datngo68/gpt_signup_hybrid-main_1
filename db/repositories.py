@@ -91,6 +91,7 @@ _EXACT_KEYS: frozenset[str] = frozenset([
     "tunnel.cloudflare.enabled",
     "ui.active_tab", "ui.link_mode",
     "web.auth_token",
+    "codex.sms_provider", "codex.sms_api_key", "codex.sms_service_id", "codex.mode", "codex.concurrency",
 ])
 
 # Sensitive keys — audit log redact value thành "***" (R10.5)
@@ -99,6 +100,7 @@ _SENSITIVE_KEYS: frozenset[str] = frozenset([
     "mail_mode.worker_config",
     "telegram.bot_token",
     "web.auth_token",
+    "codex.sms_api_key",
 ])
 
 
@@ -693,7 +695,7 @@ def _validate_type_constraint(key: str, value: Any) -> None:
 
     # --- ui namespace ---
     if key == "ui.active_tab":
-        allowed_tabs = ("reg", "session", "link", "hme", "upi", "settings")
+        allowed_tabs = ("reg", "session", "codex", "link", "hme", "upi", "settings")
         if not isinstance(value, str) or value not in allowed_tabs:
             raise RepositoryError(
                 "set", ValueError(f"{key}: must be str in {set(allowed_tabs)}, got {value!r}")
@@ -717,6 +719,56 @@ def _validate_type_constraint(key: str, value: Any) -> None:
         if len(value) > 256:
             raise RepositoryError(
                 "set", ValueError(f"{key}: len must be <= 256, got {len(value)}")
+            )
+        return
+
+    # --- codex namespace ---
+    if key == "codex.sms_provider":
+        if value is not None and not isinstance(value, str):
+            raise RepositoryError(
+                "set", TypeError(f"{key}: must be str or null, got {type(value).__name__}")
+            )
+        if isinstance(value, str) and value not in ("viotp", "chothuesimcode", ""):
+            raise RepositoryError(
+                "set", ValueError(f"{key}: must be in ('viotp', 'chothuesimcode', ''), got {value!r}")
+            )
+        return
+
+    if key == "codex.sms_api_key":
+        if value is not None and not isinstance(value, str):
+            raise RepositoryError(
+                "set", TypeError(f"{key}: must be str or null, got {type(value).__name__}")
+            )
+        if isinstance(value, str) and len(value) > 256:
+            raise RepositoryError(
+                "set", ValueError(f"{key}: len must be <= 256, got {len(value)}")
+            )
+        return
+
+    if key == "codex.sms_service_id":
+        if value is not None and not isinstance(value, str):
+            raise RepositoryError(
+                "set", TypeError(f"{key}: must be str or null, got {type(value).__name__}")
+            )
+        if isinstance(value, str) and len(value) > 64:
+            raise RepositoryError(
+                "set", ValueError(f"{key}: len must be <= 64, got {len(value)}")
+            )
+        return
+
+    if key == "codex.concurrency":
+        if type(value) is not int or not 1 <= value <= 10:
+            raise RepositoryError("set", ValueError(f"{key}: must be int in 1..10"))
+        return
+
+    if key == "codex.mode":
+        if value is not None and not isinstance(value, str):
+            raise RepositoryError(
+                "set", TypeError(f"{key}: must be str or null, got {type(value).__name__}")
+            )
+        if isinstance(value, str) and value not in ("api", "browser", ""):
+            raise RepositoryError(
+                "set", ValueError(f"{key}: must be in ('api', 'browser', ''), got {value!r}")
             )
         return
 

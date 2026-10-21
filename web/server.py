@@ -6,7 +6,7 @@ import json
 import logging
 import os
 from pathlib import Path
-from typing import Any
+from typing import Any, Optional
 
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.responses import HTMLResponse, JSONResponse, StreamingResponse
@@ -154,6 +154,8 @@ async def on_startup():
     get_session_manager().apply_settings(all_settings)
     get_link_manager().apply_settings(all_settings)
     get_upi_manager().apply_settings(all_settings)
+    from .codex_tab import manager as codex_tab_manager
+    codex_tab_manager.apply_settings(all_settings)
     # Telegram notifier — hydrate config (token/chat_id/notify toggle) từ DB.
     from .telegram_notifier import get_telegram_notifier
     get_telegram_notifier().apply_settings(all_settings)
@@ -902,6 +904,8 @@ async def on_shutdown():
         task = _rotation_queue.task
         if not task.done():
             await asyncio.shield(task)
+    from .codex_tab import manager as codex_tab_manager
+    await codex_tab_manager.shutdown()
     # 1. Mark running jobs as queued for recovery on next startup + cancel workers
     manager = get_manager()
     manager.shutdown()
@@ -2440,6 +2444,101 @@ async def notify_upi_job(job_id: str) -> JSONResponse:
     return JSONResponse({"ok": True})
 
 
+# ── Codex SMS OTP verification settings endpoints ──────────────────────
+class SetCodexSmsConfigRequest(BaseModel):
+    provider: Optional[str] = None
+    api_key: Optional[str] = None
+    service_id: Optional[str] = None
+    mode: Optional[str] = "api"
+
+
+SetCodexSmsConfigRequest.model_rebuild()
+
+
+@app.get("/api/codex/sms/config")
+async def get_codex_sms_config() -> JSONResponse:
+    """Lấy cấu hình Codex SMS hiện tại từ Settings table hoặc fallback ENV."""
+    from codex_auth.sms import get_env_sms_key
+
+    repo = _get_settings_repo()
+    provider = repo.get("codex.sms_provider") or os.environ.get("CODEX_SMS_PROVIDER") or "viotp"
+    api_key = repo.get("codex.sms_api_key") or get_env_sms_key() or ""
+    service_id = repo.get("codex.sms_service_id") or os.environ.get("CODEX_SMS_SERVICE_ID") or ("1005" if provider == "chothuesimcode" else "1234")
+    mode = repo.get("codex.mode") or "api"
+    return JSONResponse({
+        "provider": provider,
+        "api_key": api_key,
+        "service_id": service_id,
+        "mode": mode,
+        "configured": bool(provider and api_key),
+    })
+
+
+@app.post("/api/codex/sms/config")
+async def set_codex_sms_config(payload: SetCodexSmsConfigRequest) -> JSONResponse:
+    """Lưu cấu hình Codex SMS vào SQLite Settings table."""
+    repo = _get_settings_repo()
+    provider = (payload.provider or "").strip() or None
+    api_key = (payload.api_key or "").strip() or None
+    service_id = (payload.service_id or "").strip() or None
+    mode = (payload.mode or "").strip() or "api"
+
+    try:
+        repo.bulk_set({
+            "codex.sms_provider": provider,
+            "codex.sms_api_key": api_key,
+            "codex.sms_service_id": service_id,
+            "codex.mode": mode,
+        })
+    except Exception as exc:  # noqa: BLE001
+        _log.warning("Codex SMS settings write-through failed: %s", exc)
+        raise HTTPException(400, f"Lưu cấu hình thất bại: {exc}")
+
+    return JSONResponse({
+        "configured": bool(provider and api_key),
+        "provider": provider or "",
+        "service_id": service_id or "",
+        "mode": mode,
+    })
+
+
+class TestCodexSmsRequest(BaseModel):
+    provider: Optional[str] = None
+    api_key: Optional[str] = None
+    service_id: Optional[str] = None
+
+
+TestCodexSmsRequest.model_rebuild()
+
+
+@app.post("/api/codex/sms/test")
+async def test_codex_sms(payload: Optional[TestCodexSmsRequest] = None) -> JSONResponse:
+    """Kiểm tra kết nối và lấy số dư tài khoản của SMS Provider."""
+    from codex_auth.sms import create_sms_provider, get_env_sms_key, SmsError
+
+    repo = _get_settings_repo()
+    provider_name = (payload and payload.provider) or repo.get("codex.sms_provider") or os.environ.get("CODEX_SMS_PROVIDER") or "viotp"
+    api_key = (payload and payload.api_key) or repo.get("codex.sms_api_key") or get_env_sms_key() or ""
+    service_id = (payload and payload.service_id) or repo.get("codex.sms_service_id") or os.environ.get("CODEX_SMS_SERVICE_ID") or "1234"
+
+    if not api_key:
+        raise HTTPException(400, "Vui lòng nhập API Key hoặc cấu hình env AIPKEY_SMS để kiểm tra")
+
+    try:
+        prov = create_sms_provider(provider_name, api_key, service_id)
+        balance = await asyncio.to_thread(prov.get_balance)
+        return JSONResponse({
+            "ok": True,
+            "provider": provider_name,
+            "balance": balance,
+            "service_id": service_id,
+        })
+    except SmsError as exc:
+        raise HTTPException(400, f"SMS Provider test thất bại: {exc}")
+    except Exception as exc:  # noqa: BLE001
+        raise HTTPException(500, f"Lỗi không xác định: {exc}")
+
+
 # Mount static folder cho CSS/JS
 if _STATIC_DIR.exists():
     app.mount("/static", StaticFiles(directory=_STATIC_DIR), name="static")
@@ -2451,3 +2550,6 @@ if _STATIC_DIR.exists():
 from .icloud_routes import build_icloud_router  # noqa: E402
 
 app.include_router(build_icloud_router())
+
+from .codex_tab import router as codex_tab_router
+app.include_router(codex_tab_router)

@@ -17,6 +17,7 @@
   <nav class="tab-nav">
     <button class="tab-btn active" data-tab="reg">Reg</button>
     <button class="tab-btn" data-tab="session">Get Session</button>
+    <button class="tab-btn" data-tab="codex">Ver số</button>
     <button class="tab-btn" data-tab="upi">UPI QR</button>
     <!-- TẠM ẨN: Get Link + HME chưa dùng được. Mở lại = bỏ comment 2 dòng dưới. -->
     <!-- <button class="tab-btn" data-tab="link">Get Link</button> -->
@@ -60,6 +61,38 @@
     </button>
   </div>
 </header>
+
+<main class="grid tab-content" id="tab-codex">
+  <section class="card card-input">
+    <header class="card-head"><h2>Ver số</h2></header>
+    <label class="input-label" for="codex-combos">Mỗi dòng: email|password|totp_secret (tùy chọn)</label>
+    <textarea class="combo-textarea" id="codex-combos" autocomplete="off" spellcheck="false"></textarea>
+    <div class="card-actions codex-input-tools">
+      <button id="codex-import" class="btn btn-ghost btn-small" type="button">Nhập TXT</button>
+      <input id="codex-file" type="file" accept=".txt,text/plain" aria-label="Nhập tệp TXT" />
+      <button id="codex-dedup" class="btn btn-ghost btn-small">Lọc trùng dòng</button>
+      <button id="codex-clear-input" class="btn btn-ghost btn-small">Xóa ô nhập</button>
+      <span id="codex-count" class="muted" role="status">0 tài khoản</span>
+    </div>
+    <div class="card-actions">
+      <label class="input-group config-field-short" for="codex-concurrency"><span class="input-label">Đồng thời (1–10)</span>
+        <input id="codex-concurrency" type="number" min="1" max="10" step="1" value="1" />
+      </label>
+      <button id="codex-start" class="btn btn-primary">Chạy</button>
+      <button id="codex-stop" class="btn btn-danger" disabled>Dừng tất cả</button>
+    </div>
+    <p class="muted codex-help">Cấu hình tại Settings &gt; Codex SMS. Chỉ thuê khi cần thêm số. Dừng sẽ chờ yêu cầu đang chạy hoàn tất. Batch không lưu sau khởi động lại.</p>
+    <p id="codex-message" class="muted" role="status">Sẵn sàng</p>
+  </section>
+  <section class="card card-jobs"><header class="card-head"><h2>Công việc / Nhật ký</h2><span id="codex-summary" class="muted">0 công việc</span></header><div class="card-actions codex-output-tools">
+    <button id="codex-zip" class="btn btn-ghost btn-small" disabled>Tải ZIP thành công</button>
+    <button id="codex-copy-9router" class="btn btn-ghost btn-small" disabled>Sao chép JSON 9Router</button>
+    <button id="codex-download-9router" class="btn btn-ghost btn-small" disabled>Tải JSON 9Router</button>
+    <button id="codex-copy-success" class="btn btn-ghost btn-small" disabled>Copy email thành công</button>
+    <button id="codex-copy-error" class="btn btn-ghost btn-small" disabled>Copy email lỗi</button>
+    <button id="codex-clear-jobs" class="btn btn-ghost btn-small" disabled>Xóa đã xong</button>
+  </div><div id="codex-jobs"><p class="codex-empty muted">Chưa có công việc. Nhập tài khoản rồi nhấn Chạy.</p></div></section>
+</main>
 
 <!-- ════════════════ TAB: REG ════════════════ -->
 <main class="grid tab-content active" id="tab-reg">
@@ -607,6 +640,12 @@
       </span>
       <span class="settings-nav-label">Tunnel</span>
     </button>
+    <button class="settings-nav-item" data-settings-section="codex" role="tab" aria-selected="false">
+      <span class="settings-nav-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>
+      </span>
+      <span class="settings-nav-label">Codex SMS</span>
+    </button>
   </aside>
 
   <!-- Content pane -->
@@ -739,6 +778,61 @@
           <summary class="muted">Log cloudflared (20 dòng cuối)</summary>
           <pre id="tunnel-log-tail" class="tunnel-log-tail"></pre>
         </details>
+      </div>
+    </section>
+
+    <!-- ── Section: Codex SMS ── -->
+    <section class="card settings-section" id="settings-section-codex" data-settings-pane="codex">
+      <header class="card-head">
+        <h2>Codex Phone Verification (SMS)</h2>
+        <span id="codex-sms-status-badge" class="badge badge-muted">chưa cấu hình</span>
+      </header>
+
+      <div class="settings-section-body">
+        <p class="settings-hint muted">
+          Cấu hình dịch vụ thuê số nhận OTP SMS tự động vượt gate <code>add-phone</code> khi lấy <strong>Codex OAuth auth.json</strong>.
+          Hỗ trợ các nền tảng đầu số Việt Nam (+84): <strong>ViOTP</strong> (https://viotp.com) và <strong>Chothuesimcode</strong> (https://chothuesimcode.com).
+        </p>
+
+        <label class="input-group" title="Chế độ thực thi khi lấy Codex auth">
+          <span class="input-label">Chế độ thực thi</span>
+          <select id="codex-sms-mode" class="hme-select-sm">
+            <option value="api">⚡ Pure API (HTTP Request - Siêu nhẹ, nhanh, không mở trình duyệt)</option>
+            <option value="browser">🌐 Browser (Camoufox - Trình duyệt thật, dùng khi bị Cloudflare)</option>
+          </select>
+        </label>
+
+        <label class="input-group">
+          <span class="input-label">SMS Provider</span>
+          <select id="codex-sms-provider" class="hme-select-sm">
+            <option value="viotp">ViOTP (viotp.com)</option>
+            <option value="chothuesimcode">Chothuesimcode (chothuesimcode.com)</option>
+          </select>
+        </label>
+
+        <label class="input-group">
+          <span class="input-label">API Key / Token</span>
+          <input type="password" id="codex-sms-api-key" placeholder="Nhập API token của dịch vụ SMS" spellcheck="false" autocomplete="off" />
+        </label>
+
+        <label class="input-group" title="Service ID hoặc App ID cho dịch vụ OpenAI trên trang thuê sim">
+          <span class="input-label">Service / App ID</span>
+          <input type="text" id="codex-sms-service-id" placeholder="Mặc định: ViOTP='1234', Chothuesimcode='1005'" spellcheck="false" autocomplete="off" />
+        </label>
+
+        <p class="settings-hint muted" id="codex-sms-hint">
+          * ViOTP: Service ID cho <strong>OpenAI | ChatGPT</strong> là <code>1234</code> (thuê mạng Vinaphone).<br/>
+          * Chothuesimcode: App ID cho OpenAI mặc định là <code>1005</code>.
+        </p>
+
+        <div class="proxy-pool-toolbar">
+          <span id="codex-sms-balance" class="badge badge-muted" style="display:none;">Số dư: 0 đ</span>
+          <span class="settings-toolbar-spacer"></span>
+          <button id="codex-sms-test" class="btn btn-ghost btn-small" type="button">Kiểm tra số dư</button>
+          <button id="codex-sms-save" class="btn btn-primary btn-small" type="button">Lưu cấu hình</button>
+        </div>
+
+        <div id="codex-sms-status" class="proxy-pool-status muted"></div>
       </div>
     </section>
   </div>
@@ -923,6 +1017,7 @@
 <script src="/static/settings.js?v=__ASSET_VERSION__"></script>
 <script src="/static/app.js?v=__ASSET_VERSION__"></script>
 <script src="/static/session.js?v=__ASSET_VERSION__"></script>
+<script src="/static/codex.js?v=__ASSET_VERSION__"></script>
 <script src="/static/link.js?v=__ASSET_VERSION__"></script>
 <script src="/static/hme.js?v=__ASSET_VERSION__"></script>
 <script src="/static/autoreg.js?v=__ASSET_VERSION__"></script>

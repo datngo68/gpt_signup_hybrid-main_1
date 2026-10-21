@@ -94,6 +94,16 @@
     dom.tunRestart = $("tunnel-restart");
     dom.tunStatus = $("tunnel-status-line");
     dom.tunLogTail = $("tunnel-log-tail");
+    // Codex SMS section
+    dom.codexSmsMode = $("codex-sms-mode");
+    dom.codexSmsProvider = $("codex-sms-provider");
+    dom.codexSmsApiKey = $("codex-sms-api-key");
+    dom.codexSmsServiceId = $("codex-sms-service-id");
+    dom.codexSmsBadge = $("codex-sms-status-badge");
+    dom.codexSmsBalance = $("codex-sms-balance");
+    dom.codexSmsSave = $("codex-sms-save");
+    dom.codexSmsTest = $("codex-sms-test");
+    dom.codexSmsStatus = $("codex-sms-status");
   }
 
   // ── Sidebar section switching ────────────────────────────────────────────
@@ -336,6 +346,99 @@
       })
       .catch(function (err) {
         setTgStatus("Load thất bại: " + err.message, "fail");
+      });
+  }
+
+  // ── Codex SMS Section ────────────────────────────────────────────────
+  var codexSmsState = { loaded: false, busy: false };
+
+  function setCodexSmsStatus(text, kind) {
+    if (!dom.codexSmsStatus) return;
+    dom.codexSmsStatus.textContent = text || "";
+    dom.codexSmsStatus.className = "proxy-pool-status muted" + (kind ? " proxy-pool-status-" + kind : "");
+  }
+
+  function setCodexSmsBadge(configured) {
+    if (!dom.codexSmsBadge) return;
+    dom.codexSmsBadge.className = "badge " + (configured ? "badge-success" : "badge-muted");
+    dom.codexSmsBadge.textContent = configured ? "đã cấu hình" : "chưa cấu hình";
+  }
+
+  function loadCodexSms() {
+    if (!dom.codexSmsProvider) return Promise.resolve();
+    return api("/api/codex/sms/config")
+      .then(function (data) {
+        if (dom.codexSmsMode && data.mode) dom.codexSmsMode.value = data.mode;
+        if (data.provider) dom.codexSmsProvider.value = data.provider;
+        dom.codexSmsApiKey.value = data.api_key || "";
+        dom.codexSmsServiceId.value = data.service_id || "";
+        setCodexSmsBadge(!!data.configured);
+        codexSmsState.loaded = true;
+      })
+      .catch(function (err) {
+        setCodexSmsStatus("Load cấu hình SMS thất bại: " + err.message, "fail");
+      });
+  }
+
+  function saveCodexSms() {
+    if (codexSmsState.busy) return;
+    codexSmsState.busy = true;
+    setCodexSmsStatus("Đang lưu cấu hình...", null);
+    var mode = dom.codexSmsMode ? dom.codexSmsMode.value : "api";
+    var provider = dom.codexSmsProvider.value;
+    var apiKey = dom.codexSmsApiKey.value.trim();
+    var serviceId = dom.codexSmsServiceId.value.trim();
+
+    api("/api/codex/sms/config", {
+      method: "POST",
+      body: JSON.stringify({
+        mode: mode,
+        provider: provider,
+        api_key: apiKey,
+        service_id: serviceId,
+      }),
+    })
+      .then(function (res) {
+        setCodexSmsBadge(!!res.configured);
+        setCodexSmsStatus("✓ Đã lưu cấu hình SMS thành công.", "ok");
+      })
+      .catch(function (err) {
+        setCodexSmsStatus("Lưu thất bại: " + err.message, "fail");
+      })
+      .finally(function () {
+        codexSmsState.busy = false;
+      });
+  }
+
+  function testCodexSms() {
+    if (codexSmsState.busy) return;
+    codexSmsState.busy = true;
+    var provider = dom.codexSmsProvider ? dom.codexSmsProvider.value : "viotp";
+    var apiKey = dom.codexSmsApiKey ? dom.codexSmsApiKey.value.trim() : "";
+    var serviceId = dom.codexSmsServiceId ? dom.codexSmsServiceId.value.trim() : "";
+
+    api("/api/codex/sms/test", {
+      method: "POST",
+      body: JSON.stringify({
+        provider: provider,
+        api_key: apiKey,
+        service_id: serviceId,
+      }),
+    })
+      .then(function (res) {
+        setCodexSmsStatus("✓ Kết nối thành công tới " + res.provider + "!", "ok");
+        if (dom.codexSmsBalance) {
+          dom.codexSmsBalance.style.display = "inline-block";
+          var formattedBalance = Number(res.balance || 0).toLocaleString("vi-VN");
+          dom.codexSmsBalance.textContent = "Số dư: " + formattedBalance + " đ";
+          dom.codexSmsBalance.className = "badge badge-success";
+        }
+      })
+      .catch(function (err) {
+        setCodexSmsStatus("Kiểm tra thất bại: " + err.message, "fail");
+      })
+      .finally(function () {
+        codexSmsState.busy = false;
       });
   }
 
@@ -611,6 +714,16 @@
     if (dom.tunUrlCopy) dom.tunUrlCopy.addEventListener("click", copyTunnelUrl);
     if (dom.tunUrlOpen) dom.tunUrlOpen.addEventListener("click", openTunnelUrl);
 
+    if (dom.codexSmsSave) dom.codexSmsSave.addEventListener("click", saveCodexSms);
+    if (dom.codexSmsTest) dom.codexSmsTest.addEventListener("click", testCodexSms);
+    if (dom.codexSmsProvider) {
+      dom.codexSmsProvider.addEventListener("change", function () {
+        if (["", "1234", "1005"].indexOf(dom.codexSmsServiceId.value.trim()) !== -1) {
+          dom.codexSmsServiceId.value = dom.codexSmsProvider.value === "viotp" ? "1234" : "1005";
+        }
+      });
+    }
+
     dom.modeSelect.addEventListener("change", function () {
       state.mode = dom.modeSelect.value;
     });
@@ -658,6 +771,9 @@
       if (e.detail && e.detail.tab === "settings" && !tunState.loaded) {
         refreshTunnelStatus();
       }
+      if (e.detail && e.detail.tab === "settings" && !codexSmsState.loaded) {
+        loadCodexSms();
+      }
       if (e.detail && e.detail.tab === "settings") {
         ensureTunnelPolling(true);
       } else {
@@ -670,6 +786,7 @@
       load();
       loadTelegram();
       refreshTunnelStatus();
+      loadCodexSms();
       ensureTunnelPolling(true);
     }
   }
