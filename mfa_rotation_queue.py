@@ -44,6 +44,16 @@ class RotationQueue:
             conn.execute("UPDATE mfa_rotation_queue SET status='cancelled' WHERE status='queued'")
         self.publish()
 
+    def clear_finished(self):
+        with self.engine.get_connection() as conn:
+            cursor = conn.execute(
+                "DELETE FROM mfa_rotation_queue WHERE status IN ('success', 'error', 'cancelled')"
+            )
+            removed = cursor.rowcount
+        if removed:
+            self.publish()
+        return removed
+
     def update(self, job_id, status, error=None):
         with self.engine.get_connection() as conn:
             conn.execute('UPDATE mfa_rotation_queue SET status=?,error=? WHERE job_id=?', (status, error, job_id))

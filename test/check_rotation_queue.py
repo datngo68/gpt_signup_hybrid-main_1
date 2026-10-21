@@ -37,6 +37,9 @@ async def check():
         recovered.start()
         await recovered.task
         assert calls == ['bad', 'good']
+        removed = recovered.clear_finished()
+        assert removed == 3
+        assert recovered.snapshot() == []
         from fastapi import HTTPException
         from pydantic import ValidationError
         from starlette.requests import Request
@@ -44,6 +47,13 @@ async def check():
         from web.auth import reset_token_for_tests
         reset_token_for_tests('offline-token')
         request = Request({'type': 'http', 'headers': [(b'x-api-token', b'offline-token')]})
+        cleared = []
+        session_manager = SimpleNamespace(clear_finished=lambda: 2)
+        rotation_queue = SimpleNamespace(clear_finished=lambda: cleared.append(True))
+        with patch.object(server, 'get_session_manager', return_value=session_manager), patch.object(server, 'get_rotation_queue', return_value=rotation_queue):
+            response = await server.clear_finished_session_jobs()
+            assert json.loads(response.body) == {'removed': 2}
+            assert cleared == [True]
         try:
             server.QueueRotationsRequest(job_ids=[], confirmed=True)
             raise AssertionError('empty selection accepted')

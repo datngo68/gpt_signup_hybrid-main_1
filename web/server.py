@@ -1224,6 +1224,7 @@ async def clear_finished_session_jobs() -> JSONResponse:
     removed = sm.clear_finished()
     if removed < 0:
         raise HTTPException(503, "storage temporarily unavailable")
+    get_rotation_queue().clear_finished()
     return JSONResponse({"removed": removed})
 
 
