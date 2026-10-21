@@ -451,26 +451,6 @@ async def _get_session_browser(
             f"{session_data.get('user', {}).get('email', '?')}"
         )
 
-        try:
-            session_data["plan_check"] = await fetch_account_entitlement(
-                access_token=session_data["accessToken"],
-                proxy=proxy,
-            )
-            log("[session] Plus entitlement fetched")
-        except Exception as exc:
-            session_data["plan_check_error"] = str(exc)[:200]
-            log(f"[session] Plus entitlement unavailable: {str(exc)[:120]}")
-
-        try:
-            session_data["codex_quota"] = await fetch_codex_quota(
-                access_token=session_data["accessToken"],
-                proxy=proxy,
-            )
-            log("[session] Codex quota fetched")
-        except Exception as exc:
-            session_data["codex_quota_error"] = str(exc)[:200]
-            log(f"[session] Codex quota unavailable: {str(exc)[:120]}")
-
         # Gắn __cookies vào session (đồng nhất với get_session_pure_request):
         # UPI cần cookies cho auth_sink/check_plan. Caller KHÔNG dùng cookies
         # (Get Session) PHẢI strip __cookies trước khi broadcast SSE / persist DB.
@@ -603,9 +583,6 @@ async def _get_session_browser(
                     raise
                 except Exception as exc:
                     last_exc = exc
-                    if engine == "camoufox" and "CamoufoxNotInstalled" in type(exc).__name__:
-                        log("[session] Camoufox chưa cài — fallback sang chromium")
-                        break
                     retryable = _is_driver_dead_error(exc) or _is_network_error(exc)
                     if not retryable:
                         raise SessionError(
@@ -885,69 +862,6 @@ def _parse_entitlement_plan(data: dict[str, Any]) -> dict[str, Any]:
     }
 
 
-def _parse_codex_quota(data: dict[str, Any]) -> dict[str, Any]:
-    """Parse Codex quota từ /backend-api/wham/usage.
-
-    Shape theo 9router `getCodexUsage`: rate_limit primary/secondary windows +
-    optional review limit. Trả percent-based quota, không đoán token absolute.
-    """
-    def _num(value: Any, default: float = 0.0) -> float:
-        try:
-            return float(value)
-        except (TypeError, ValueError):
-            return default
-
-    def _window(raw: Any) -> dict[str, Any] | None:
-        if not isinstance(raw, dict):
-            return None
-        used = max(0.0, min(100.0, _num(raw.get("used_percent", raw.get("percent_used")))))
-        return {
-            "used": used,
-            "total": 100,
-            "remaining": max(0.0, 100.0 - used),
-            "reset_at": raw.get("reset_at") or raw.get("resets_at") or raw.get("resetAt"),
-            "limit_reached": bool(raw.get("limit_reached")),
-        }
-
-    def _body(raw: Any) -> dict[str, Any]:
-        if not isinstance(raw, dict):
-            return {}
-        nested = raw.get("rate_limit")
-        return nested if isinstance(nested, dict) else raw
-
-    normal = _body(data.get("rate_limit") or data.get("rate_limits") or data.get("rate_limits_by_limit_id", {}).get("codex"))
-    review = _body(
-        data.get("code_review_rate_limit")
-        or data.get("review_rate_limit")
-        or data.get("rate_limits_by_limit_id", {}).get("code_review")
-        or data.get("rate_limits_by_limit_id", {}).get("codex_review")
-        or data.get("rate_limits_by_limit_id", {}).get("review")
-    )
-    quotas: dict[str, Any] = {}
-    for key, raw in (
-        ("session", normal.get("primary_window") or normal.get("primary")),
-        ("weekly", normal.get("secondary_window") or normal.get("secondary")),
-        ("review_session", review.get("primary_window") or review.get("primary")),
-        ("review_weekly", review.get("secondary_window") or review.get("secondary")),
-    ):
-        parsed = _window(raw)
-        if parsed:
-            quotas[key] = parsed
-
-    credits = data.get("rate_limit_reset_credits")
-    available_credits = 0
-    if isinstance(credits, dict):
-        available_credits = max(0, int(_num(credits.get("available_count"))))
-
-    return {
-        "plan": data.get("plan_type") or (data.get("summary") or {}).get("plan") or "unknown",
-        "limit_reached": bool(normal.get("limit_reached")),
-        "review_limit_reached": bool(review.get("limit_reached")),
-        "reset_credits": {"available_count": available_credits},
-        "quotas": quotas,
-    }
-
-
 async def fetch_account_entitlement(
     *,
     access_token: str,
@@ -1037,52 +951,6 @@ async def fetch_account_entitlement(
         raise SessionError(f"JSON parse fail: {_scrub_jwt(str(exc))}") from exc
 
     return _parse_entitlement_plan(data)
-
-
-async def fetch_codex_quota(
-    *,
-    access_token: str,
-    proxy: str | None = None,
-    timeout: float = 20.0,
-    impersonate: str | None = None,
-) -> dict[str, Any]:
-    """GET Codex quota từ ChatGPT WHAM usage endpoint.
-
-    Dựa trên 9router `getCodexUsage`: `https://chatgpt.com/backend-api/wham/usage`.
-    """
-    from curl_cffi.requests import AsyncSession
-    from user_agent_profile import CURL_IMPERSONATE_PRIMARY
-
-    if not isinstance(access_token, str) or not access_token.strip():
-        raise SessionError("access_token thiếu hoặc rỗng")
-
-    if impersonate is None:
-        impersonate = CURL_IMPERSONATE_PRIMARY
-
-    headers = {
-        "Authorization": f"Bearer {access_token}",
-        "Accept": "application/json",
-    }
-    proxies = {"http": proxy, "https": proxy} if proxy else None
-    async with AsyncSession(impersonate=impersonate, proxies=proxies) as sess:
-        try:
-            resp = await sess.get(
-                "https://chatgpt.com/backend-api/wham/usage",
-                headers=headers,
-                timeout=timeout,
-            )
-        except Exception as exc:
-            raise SessionError(f"network error: {_scrub_jwt(str(exc))}") from exc
-
-    if resp.status_code != 200:
-        raise SessionError(f"HTTP {resp.status_code}")
-
-    try:
-        data = resp.json()
-    except Exception as exc:
-        raise SessionError(f"JSON parse fail: {_scrub_jwt(str(exc))}") from exc
-
-    return _parse_codex_quota(data)
 
 
 # ─────────────────────────────────────────────────────────────────────
@@ -1473,85 +1341,45 @@ async def get_session_pure_request(
             # ── Branch A: password login ──
             if flow == "password":
                 log("[session-req] password login flow...")
-
-                def _password_verify_once() -> Any:
-                    if flow_mode == "anti409":
-                        # Warm sentinel.openai.com sdk.js + frame.html với Referer
-                        # /log-in/password → server nhận token là từ password verify
-                        # flow (giảm reject token yếu).
-                        try:
-                            session.get(
-                                "https://sentinel.openai.com/backend-api/sentinel/sdk.js",
-                                headers={"Referer": "https://auth.openai.com/log-in/password"},
-                                timeout=15,
-                            )
-                            session.get(
-                                "https://sentinel.openai.com/backend-api/sentinel/frame.html",
-                                params={"sv": "20260219f9f6"},
-                                headers={"Referer": "https://auth.openai.com/log-in/password"},
-                                timeout=15,
-                            )
-                        except Exception as _warm_exc:
-                            log(f"[session-req] sentinel warming non-fatal: {_warm_exc}")
-                    headers = _common_headers("https://auth.openai.com/log-in/password")
-                    headers["Content-Type"] = "application/json"
-                    if device_id:
-                        headers["oai-device-id"] = device_id
-                    # anti409: sentinel flow="password_verify" (reference) — server map
-                    # flow → required action; "login" có thể trả token không hợp lệ cho
-                    # endpoint password/verify. legacy giữ "login".
-                    _sentinel_flow = "password_verify" if flow_mode == "anti409" else "login"
-                    # pure_request mode: no browser oracle → sync QuickJS.
-                    sentinel_pw = _get_sentinel_token(
-                        session, device_id, _sentinel_flow, log,
-                    )
-                    if sentinel_pw:
-                        headers["openai-sentinel-token"] = sentinel_pw
-                    return session.post(
-                        "https://auth.openai.com/api/accounts/password/verify",
-                        headers=headers,
-                        json={"password": password},
-                        timeout=30,
-                    )
-
-                resp = _password_verify_once()
-                if resp.status_code == 409 and "invalid_state" in ((resp.text or "").lower()):
-                    log("[session-req] password verify invalid_state — start over với session mới...")
+                if flow_mode == "anti409":
+                    # Warm sentinel.openai.com sdk.js + frame.html với Referer
+                    # /log-in/password → server nhận token là từ password verify
+                    # flow (giảm reject token yếu).
                     try:
-                        session.close()
-                    except Exception:
-                        pass
-                    session, device_id, auth_url, landing = _do_bootstrap(use_login_hint=False)
-                    flow = _detect_flow_from_landing(landing)
-                    if not flow:
-                        log("[session-req] invalid_state retry: resolve qua authorize/continue clean...")
-                        ac_sentinel = _get_sentinel_token(
-                            session, device_id, "login", log,
+                        session.get(
+                            "https://sentinel.openai.com/backend-api/sentinel/sdk.js",
+                            headers={"Referer": "https://auth.openai.com/log-in/password"},
+                            timeout=15,
                         )
-                        try:
-                            ac_data = _step_authorize_continue(
-                                session, email, ac_sentinel,
-                                screen_hint="login",
-                                referer="https://auth.openai.com/log-in",
-                                device_id=device_id,
-                                log=log,
-                            )
-                        except RequestPhaseError as exc:
-                            raise SessionError(
-                                f"invalid_state retry authorize/continue failed: {exc}"
-                            ) from exc
-                        ac_page = ac_data.get("page", {}) if isinstance(ac_data, dict) else {}
-                        page_type = (ac_page.get("type") or "").strip()
-                        continue_url = (ac_data.get("continue_url") or "").strip()
-                        if page_type == "login_password" or "/log-in/password" in continue_url:
-                            flow = "password"
-                        elif page_type in ("email_otp_verification", "email_verification") or "/email-verification" in continue_url:
-                            flow = "otp"
-                    if flow != "password":
-                        raise SessionError(
-                            f"password verify invalid_state retry landed non-password flow: {landing[:120]!r}"
+                        session.get(
+                            "https://sentinel.openai.com/backend-api/sentinel/frame.html",
+                            params={"sv": "20260219f9f6"},
+                            headers={"Referer": "https://auth.openai.com/log-in/password"},
+                            timeout=15,
                         )
-                    resp = _password_verify_once()
+                    except Exception as _warm_exc:
+                        log(f"[session-req] sentinel warming non-fatal: {_warm_exc}")
+                headers = _common_headers("https://auth.openai.com/log-in/password")
+                headers["Content-Type"] = "application/json"
+                if device_id:
+                    headers["oai-device-id"] = device_id
+                # anti409: sentinel flow="password_verify" (reference) — server map
+                # flow → required action; "login" có thể trả token không hợp lệ cho
+                # endpoint password/verify. legacy giữ "login".
+                _sentinel_flow = "password_verify" if flow_mode == "anti409" else "login"
+                # pure_request mode: no browser oracle → sync QuickJS.
+                sentinel_pw = _get_sentinel_token(
+                    session, device_id, _sentinel_flow, log,
+                )
+                if sentinel_pw:
+                    headers["openai-sentinel-token"] = sentinel_pw
+
+                resp = session.post(
+                    "https://auth.openai.com/api/accounts/password/verify",
+                    headers=headers,
+                    json={"password": password},
+                    timeout=30,
+                )
                 if resp.status_code != 200:
                     body = (resp.text or "")[:300]
                     raise SessionError(f"password verify failed: HTTP {resp.status_code} - {body}")
@@ -1802,24 +1630,6 @@ async def get_session_pure_request(
                 raise SessionError(
                     f"login completed but /api/auth/session has no accessToken: {str(session_data)[:200]}"
                 )
-
-            try:
-                session_data["plan_check"] = asyncio.run(
-                    fetch_account_entitlement(access_token=session_data["accessToken"])
-                )
-                log("[session-req] Plus entitlement fetched")
-            except Exception as exc:
-                session_data["plan_check_error"] = str(exc)[:200]
-                log(f"[session-req] Plus entitlement unavailable: {str(exc)[:120]}")
-
-            try:
-                session_data["codex_quota"] = asyncio.run(
-                    fetch_codex_quota(access_token=session_data["accessToken"])
-                )
-                log("[session-req] Codex quota fetched")
-            except Exception as exc:
-                session_data["codex_quota_error"] = str(exc)[:200]
-                log(f"[session-req] Codex quota unavailable: {str(exc)[:120]}")
 
             user_email = (session_data.get("user", {}) or {}).get("email", "") or email
             log(f"[session-req] ✓ done — user: {user_email}")
